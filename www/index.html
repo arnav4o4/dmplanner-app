@@ -61,7 +61,6 @@
             pointer-events: none;
             z-index: 120;
             background-color: transparent;
-            /* Replaced 9999px box-shadow with safe inset shadow to avoid WebView layout bugs */
             box-shadow: 0 0 0 9999px rgba(10, 14, 13, 0.82), inset 0 0 20px rgba(10, 14, 13, 0.82);
             box-sizing: border-box;
         }
@@ -112,7 +111,7 @@
             position: fixed;
             top: 12px;
             left: 50%;
-            transform: translate(-50%, -120%); /* Use transform instead of top: -350px */
+            transform: translate(-50%, -120%);
             width: 420px;
             max-width: calc(100vw - 32px);
             background: var(--panel-bg);
@@ -188,7 +187,7 @@
             position: fixed;
             bottom: 0;
             left: 50%;
-            transform: translate(-50%, 120%); /* Use transform instead of bottom: -300px */
+            transform: translate(-50%, 120%);
             width: 380px;
             max-width: calc(100vw - 32px);
             background: var(--panel-bg);
@@ -233,20 +232,20 @@
         @media (max-width: 768px) {
             body {
                 align-items: flex-start;
-                padding: 60px 0; /* Add top/bottom padding for notches on mobile */
-                overflow-y: auto; /* Enable page scrolling on mobile */
+                padding: 60px 0;
+                overflow-y: auto;
             }
     
             .container {
                 flex-direction: column;
                 align-items: center;
-                width: calc(100% - 24px); /* Slightly wider on mobile */
+                width: calc(100% - 24px);
                 padding: 16px;
                 gap: 20px;
             }
     
             .dial-wrapper {
-                width: min(300px, 75vw) !important; /* Scale dial down dynamically on mobile */
+                width: min(300px, 75vw) !important;
                 height: min(300px, 75vw) !important;
             }
         }
@@ -464,6 +463,10 @@
         select:focus {
             border-color: var(--accent-color);
         }
+
+        input[type="date"] {
+            color-scheme: dark;
+        }
     
         .time-inputs {
             display: grid;
@@ -549,6 +552,14 @@
         .edit-btn:hover {
             background: rgba(249, 226, 175, 0.15);
         }
+
+        .copy-btn {
+            color: #89b4fa;
+        }
+
+        .copy-btn:hover {
+            background: rgba(137, 180, 250, 0.15);
+        }
     
         .tick-btn {
             color: #a6e3a1;
@@ -632,7 +643,7 @@
             right: 0;
             width: 380px;
             max-width: calc(100vw - 24px);
-            transform: translateX(110%); /* Fixed horizontal stretch bug */
+            transform: translateX(110%);
             background: var(--panel-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -673,6 +684,10 @@
             font-size: 1.4rem;
             cursor: pointer;
             width: auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
         }
     
         .close-drawer-btn:hover {
@@ -815,10 +830,17 @@
         .todo-input-row {
             display: flex;
             gap: 8px;
+            align-items: center;
         }
     
         .todo-input-row input {
             flex: 1;
+            width: auto;
+        }
+
+        .todo-input-row button {
+            width: auto;
+            flex-shrink: 0;
         }
     
         .todo-list {
@@ -843,6 +865,32 @@
         .todo-item.done span.todo-text {
             text-decoration: line-through;
             color: #6c7086;
+        }
+
+        /* ==================== SEARCH MODAL STYLES ==================== */
+        .search-result-item {
+            display: flex;
+            flex-direction: column;
+            background: rgba(30, 30, 30, 0.8);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            gap: 4px;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+            border: 1px solid transparent;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .search-result-item:hover {
+            background: rgba(249, 226, 175, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        .search-date {
+            font-size: 0.7rem;
+            color: var(--accent-color);
+            font-weight: bold;
         }
     </style>
 </head>
@@ -874,7 +922,10 @@
     <div class="top-notch-panel" id="top-notch-panel">
         <div class="top-notch-header">
             <h4 id="top-notch-title">Today's Tasks</h4>
-            <button class="close-drawer-btn" onclick="toggleTopNotch()">&times;</button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button class="close-drawer-btn" style="font-size: 1.2rem; font-weight: bold;" onclick="openTodayModalFromTopNotch()" title="Add Task to Today">&plus;</button>
+                <button class="close-drawer-btn" onclick="toggleTopNotch()">&times;</button>
+            </div>
         </div>
         <div class="todo-list" id="top-notch-todo-list"></div>
     </div>
@@ -977,7 +1028,15 @@
     <div class="calendar-drawer" id="calendar-drawer">
         <div class="calendar-header">
             <h3>Monthly Planner</h3>
-            <button class="close-drawer-btn" onclick="toggleCalendar()">&times;</button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button class="close-drawer-btn" onclick="openSearchModal()" title="Search Tasks">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="overflow: visible; display: block;">
+                        <circle cx="10" cy="10" r="7"></circle>
+                        <line x1="6" y1="17" x2="3" y2="21"></line>
+                    </svg>
+                </button>
+                <button class="close-drawer-btn" onclick="toggleCalendar()">&times;</button>
+            </div>
         </div>
         <div class="month-nav">
             <button onclick="changeMonth(-1)">&lt;</button>
@@ -1000,6 +1059,38 @@
             </div>
             <div class="todo-list" id="modal-todo-list"></div>
             <button class="add-btn" onclick="saveAndCloseModal()">Save & Close</button>
+        </div>
+    </div>
+
+    <!-- SEARCH POPUP MODAL -->
+    <div class="modal-overlay" id="search-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h4>Search Older Tasks</h4>
+                <button class="close-drawer-btn" onclick="closeSearchModal()">&times;</button>
+            </div>
+            <div class="todo-input-row" style="margin-top: 5px;">
+                <input type="text" id="search-task-input" placeholder="Type task name..." onkeyup="performSearch()">
+            </div>
+            <div class="todo-list" id="search-results-list" style="margin-top: 10px; max-height: 250px;">
+                <!-- Search results will populate here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- COPY TASK TO DATE MODAL -->
+    <div class="modal-overlay" id="copy-modal">
+        <div class="modal-card" style="z-index: 250;">
+            <div class="modal-header">
+                <h4>Copy Task to Date</h4>
+                <button class="close-drawer-btn" onclick="closeCopyModal()">&times;</button>
+            </div>
+            <div style="font-size: 0.8rem; color: #a6adc8; word-break: break-word;" id="copy-task-title-preview"></div>
+            <div class="input-group" style="margin-top: 5px;">
+                <label for="copy-target-date">Target Date</label>
+                <input type="date" id="copy-target-date">
+            </div>
+            <button class="add-btn" onclick="confirmCopyTask()">Paste Task to Date</button>
         </div>
     </div>
 
@@ -1200,7 +1291,6 @@
             const isEditing = btnElem.classList.contains('fa-check') || btnElem.innerHTML === '✓';
 
             if (!isEditing) {
-                // Switch to input mode
                 const currentText = nameSpan.textContent;
                 nameSpan.innerHTML = `<input type="text" class="inline-edit-input" value="${escapeHtml(currentText)}">`;
                 btnElem.innerHTML = '✓';
@@ -1216,7 +1306,6 @@
                     }
                 };
             } else {
-                // Save mode
                 const input = nameSpan.querySelector('input');
                 saveEditTask(id, input ? input.value : nameSpan.textContent, btnElem);
             }
@@ -1299,7 +1388,7 @@
                     <span class="task-time">${task.start} - ${task.end}</span>
                 </div>
                 <div class="task-actions">
-                    <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditTask(${task.id}, this)">✎</button>
+                    <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditTask(${task.id}, this)">🖍</button>
                     <button class="delete-btn" title="Delete Task" onclick="deleteTask(${task.id})">&times;</button>
                 </div>
             `;
@@ -1396,6 +1485,8 @@
         let calendarDate = new Date();
         let selectedDateKey = '';
         let dailyTodos = JSON.parse(localStorage.getItem('planner_daily_todos')) || {};
+        let openedFromSearch = false;
+        let taskToCopyText = "";
 
         function getFormattedTodayKey() {
             const today = new Date();
@@ -1426,7 +1517,8 @@
                     <span class="todo-text" style="flex:1;">${escapeHtml(item.text)}</span>
                     <div class="task-actions">
                         <button class="action-btn arrow-btn" title="Add to Dial Task Name" onclick="placeTaskToDial('${escapeHtml(item.text).replace(/'/g, "\\'")}')">⬇</button>
-                        <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditTopNotchTodo(${index}, this)">✎</button>
+                        <button class="action-btn copy-btn" title="Copy to Date" onclick="openCopyModal('${escapeHtml(item.text).replace(/'/g, "\\'")}')">⎙</button>
+                        <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditTopNotchTodo(${index}, this)">🖍</button>
                         <button class="delete-btn" title="Delete Task" onclick="deleteTopNotchTodo(${index})">&times;</button>
                     </div>
                 `;
@@ -1437,7 +1529,17 @@
         function placeTaskToDial(taskText) {
             document.getElementById('task-title').value = taskText;
             document.getElementById('task-title').focus();
-            toggleTopNotch(); // Close notch panel after clicking
+            toggleTopNotch();
+        }
+
+        function openTodayModalFromTopNotch() {
+            const todayKey = getFormattedTodayKey();
+            const today = new Date();
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            
+            toggleTopNotch(); // Close top notch panel
+            openedFromSearch = false;
+            openTodoModal(todayKey, today.getDate(), monthNames[today.getMonth()], today.getFullYear());
         }
 
         function toggleEditTopNotchTodo(index, btnElem) {
@@ -1549,7 +1651,10 @@
                 }
 
                 cell.innerHTML = content;
-                cell.onclick = () => openTodoModal(formattedDateKey, day, monthNames[month], year);
+                cell.onclick = () => {
+                    openedFromSearch = false;
+                    openTodoModal(formattedDateKey, day, monthNames[month], year);
+                };
                 grid.appendChild(cell);
             }
 
@@ -1568,6 +1673,14 @@
 
         function closeModal() {
             document.getElementById('todo-modal').classList.remove('active');
+            if (openedFromSearch) {
+                openedFromSearch = false;
+                setTimeout(() => {
+                    performSearch();
+                    document.getElementById('search-modal').classList.add('active');
+                    document.getElementById('search-task-input').focus();
+                }, 250);
+            }
         }
 
         function addTodoItem() {
@@ -1633,7 +1746,8 @@
                 div.innerHTML = `
                     <span class="todo-text" onclick="toggleTodoDone(${index})" style="cursor:pointer; flex:1;">${escapeHtml(item.text)}</span>
                     <div class="task-actions">
-                        <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditModalTodo(${index}, this)">✎</button>
+                        <button class="action-btn copy-btn" title="Copy to Date" onclick="openCopyModal('${escapeHtml(item.text).replace(/'/g, "\\'")}')">⎙</button>
+                        <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditModalTodo(${index}, this)">🖍</button>
                         <button class="delete-btn" title="Delete Task" onclick="deleteTodoItem(${index})">&times;</button>
                     </div>
                 `;
@@ -1651,6 +1765,135 @@
             renderCalendar();
             closeModal();
         }
+
+        /* ==================== SEARCH LOGIC & TRANSITION ==================== */
+        function openSearchModal() {
+            document.getElementById('search-task-input').value = '';
+            document.getElementById('search-results-list').innerHTML = '<div style="color: #6c7086; font-size: 0.8rem; text-align: center; margin-top: 10px;">Start typing to search...</div>';
+            document.getElementById('search-modal').classList.add('active');
+            
+            setTimeout(() => {
+                document.getElementById('search-task-input').focus();
+            }, 100);
+        }
+
+        function closeSearchModal() {
+            document.getElementById('search-modal').classList.remove('active');
+        }
+
+        function performSearch() {
+            const query = document.getElementById('search-task-input').value.trim().toLowerCase();
+            const resultsList = document.getElementById('search-results-list');
+            
+            if (!query) {
+                resultsList.innerHTML = '<div style="color: #6c7086; font-size: 0.8rem; text-align: center; margin-top: 10px;">Start typing to search...</div>';
+                return;
+            }
+
+            let resultsHTML = '';
+            let foundCount = 0;
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            for (const [dateKey, tasksArray] of Object.entries(dailyTodos)) {
+                tasksArray.forEach(task => {
+                    if (task.text.toLowerCase().includes(query)) {
+                        foundCount++;
+                        
+                        const [y, m, d] = dateKey.split('-');
+                        const dateObj = new Date(parseInt(y, 10), parseInt(m, 10) - 1, parseInt(d, 10));
+                        const displayDate = `${monthNames[dateObj.getMonth()]} ${parseInt(d, 10)}, ${y}`;
+
+                        resultsHTML += `
+                            <div class="search-result-item" onclick="jumpToTaskDate('${dateKey}')">
+                                <span class="todo-text">${escapeHtml(task.text)}</span>
+                                <span class="search-date">${displayDate}</span>
+                            </div>
+                        `;
+                    }
+                });
+            }
+
+            if (foundCount === 0) {
+                resultsList.innerHTML = '<div style="color: #6c7086; font-size: 0.8rem; text-align: center; margin-top: 10px;">No tasks found.</div>';
+            } else {
+                resultsList.innerHTML = resultsHTML;
+            }
+        }
+
+        function jumpToTaskDate(dateKey) {
+            openedFromSearch = true;
+            closeSearchModal();
+            
+            setTimeout(() => {
+                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                const [y, m, d] = dateKey.split('-');
+                
+                const monthName = monthNames[parseInt(m, 10) - 1];
+                const day = parseInt(d, 10);
+                const year = parseInt(y, 10);
+                
+                openTodoModal(dateKey, day, monthName, year);
+            }, 250); 
+        }
+
+        /* ==================== COPY TASK LOGIC ==================== */
+        function openCopyModal(taskText) {
+            taskToCopyText = taskText;
+            document.getElementById('copy-task-title-preview').textContent = `Task: "${taskText}"`;
+            
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            document.getElementById('copy-target-date').value = todayStr;
+            
+            document.getElementById('copy-modal').classList.add('active');
+        }
+
+        function closeCopyModal() {
+            document.getElementById('copy-modal').classList.remove('active');
+        }
+
+        function confirmCopyTask() {
+            const targetDateKey = document.getElementById('copy-target-date').value;
+            if (!targetDateKey) {
+                alert("Please select a valid target date.");
+                return;
+            }
+
+            if (!dailyTodos[targetDateKey]) {
+                dailyTodos[targetDateKey] = [];
+            }
+
+            dailyTodos[targetDateKey].push({
+                text: taskToCopyText,
+                completed: false
+            });
+
+            localStorage.setItem('planner_daily_todos', JSON.stringify(dailyTodos));
+            renderCalendar();
+            closeCopyModal();
+
+            if (selectedDateKey === targetDateKey && document.getElementById('todo-modal').classList.contains('active')) {
+                activeModalTodos.push({ text: taskToCopyText, completed: false });
+                renderModalTodoList();
+            }
+        }
+
+        /* ==================== KEYBOARD SHORTCUTS ==================== */
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                if (document.getElementById('copy-modal').classList.contains('active')) {
+                    closeCopyModal();
+                } else if (document.getElementById('todo-modal').classList.contains('active')) {
+                    closeModal();
+                } else if (document.getElementById('search-modal').classList.contains('active')) {
+                    closeSearchModal();
+                } else if (document.getElementById('top-notch-panel').classList.contains('open')) {
+                    document.getElementById('top-notch-panel').classList.remove('open');
+                } else if (document.getElementById('calendar-drawer').classList.contains('open')) {
+                    document.getElementById('calendar-drawer').classList.remove('open');
+                }
+            }
+        });
 
         buildDial();
         updateUI();
