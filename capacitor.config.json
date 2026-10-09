@@ -1,0 +1,10 @@
+{
+  "appId": "com.arnav.dmplanner.app",
+  "appName": "DMPlanner",
+  "webDir": "www",
+  "plugins": {
+    "StatusBar": {
+      "overlaysWebView": false
+    }
+  }
+}

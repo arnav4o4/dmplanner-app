@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>24-Hour Digital Planner</title>
+    <!-- Import JetBrains Mono Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0A0A0A;
+            --panel-bg: rgba(10, 14, 13, 0.82);
+            --text-color: #cdd6f4;
+            --accent-color: #BA9640;
+            --border-color: #0c100f;
+    
+            --digital-hour: #ffffff;
+            --digital-minute: #BA9640;
+            --digital-second: #f38ba8;
+            --time-indicator: #ff5555;
+        }
+    
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden; /* Fixes WebView canvas stretching */
+        }
+    
+        body {
+            font-family: 'JetBrains Mono', monospace, system-ui;
+            background-color: var(--bg-color);
+            background-image: url('https://i.ibb.co/XxsW1wbq/bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+    
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            position: relative;
+        }
+    
+        /* ==================== WHOLE WEBSITE FRAME ==================== */
+        .site-frame {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            pointer-events: none;
+            z-index: 120;
+            background-color: transparent;
+            /* Replaced 9999px box-shadow with safe inset shadow to avoid WebView layout bugs */
+            box-shadow: 0 0 0 9999px rgba(10, 14, 13, 0.82), inset 0 0 20px rgba(10, 14, 13, 0.82);
+            box-sizing: border-box;
+        }
+    
+        /* ==================== TOP NOTCH BAR ==================== */
+        .top-notch {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0 0 12px 12px;
+            padding: 8px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            z-index: 150;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: border-color 0.2s, background 0.2s;
+            box-sizing: border-box;
+        }
+    
+        .top-notch:hover {
+            border-color: var(--accent-color);
+            background: rgba(10, 14, 13, 0.92);
+        }
+    
+        .top-notch-date {
+            font-weight: bold;
+            color: #fff;
+            font-size: 0.85rem;
+        }
+    
+        .top-notch-badge {
+            background: var(--accent-color);
+            color: #111;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+    
+        .top-notch-panel {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translate(-50%, -120%); /* Use transform instead of top: -350px */
+            width: 420px;
+            max-width: calc(100vw - 32px);
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 16px 16px;
+            padding: 20px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
+            z-index: 149;
+            transition: transform 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
+            box-sizing: border-box;
+        }
+    
+        .top-notch-panel.open {
+            transform: translate(-50%, 0);
+            padding-top: 50px;
+        }
+    
+        .top-notch-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+    
+        .top-notch-header h4 {
+            margin: 0;
+            color: var(--accent-color);
+            font-size: 0.95rem;
+        }
+    
+        /* ==================== FIXED BOTTOM NOTCH & PANEL ==================== */
+        .bottom-notch-wrapper {
+            position: fixed;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 150;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    
+        .bottom-notch {
+            position: relative;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px 12px 0 0;
+            padding: 8px 24px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            z-index: 151;
+            box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: border-color 0.2s, background 0.2s;
+            box-sizing: border-box;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #fff;
+        }
+    
+        .bottom-notch-wrapper:hover .bottom-notch {
+            border-color: #e1819c;
+            background: rgba(10, 14, 13, 0.92);
+        }
+    
+        .bottom-notch-panel {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translate(-50%, 120%); /* Use transform instead of bottom: -300px */
+            width: 380px;
+            max-width: calc(100vw - 32px);
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            border-radius: 16px 16px 0 0;
+            padding: 20px 20px 52px 20px;
+            box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.7);
+            z-index: 149;
+            transition: transform 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
+            box-sizing: border-box;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-color);
+            pointer-events: none;
+        }
+    
+        .bottom-notch-wrapper:hover .bottom-notch-panel {
+            transform: translate(-50%, 0);
+        }
+    
+        /* ==================== MAIN CONTAINER ==================== */
+        .container {
+            display: flex;
+            flex-direction: row;
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 24px;
+            gap: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            max-width: 900px;
+            width: calc(100% - 80px);
+            z-index: 10;
+            box-sizing: border-box;
+        }
+    
+        @media (max-width: 768px) {
+            body {
+                align-items: flex-start;
+                padding: 60px 0; /* Add top/bottom padding for notches on mobile */
+                overflow-y: auto; /* Enable page scrolling on mobile */
+            }
+    
+            .container {
+                flex-direction: column;
+                align-items: center;
+                width: calc(100% - 24px); /* Slightly wider on mobile */
+                padding: 16px;
+                gap: 20px;
+            }
+    
+            .dial-wrapper {
+                width: min(300px, 75vw) !important; /* Scale dial down dynamically on mobile */
+                height: min(300px, 75vw) !important;
+            }
+        }
+    
+        .visual-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+    
+        .dial-wrapper {
+            position: relative;
+            width: 340px;
+            height: 340px;
+        }
+    
+        svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+    
+        .dial-background {
+            fill: #0A0A0A;
+            stroke: var(--border-color);
+            stroke-width: 2;
+        }
+    
+        .hour-marker {
+            stroke: #a6adc8;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+    
+        .hour-text {
+            fill: #cdd6f4;
+            font-size: 11px;
+            font-weight: bold;
+            font-family: 'JetBrains Mono', monospace;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+    
+        .task-slice {
+            cursor: grab;
+            transition: opacity 0.2s ease, filter 0.2s ease;
+        }
+    
+        .task-slice:hover {
+            opacity: 0.95 !important;
+            filter: brightness(1.2);
+        }
+    
+        .task-slice.dragging {
+            cursor: grabbing !important;
+            opacity: 0.9 !important;
+            filter: brightness(1.3);
+        }
+    
+        /* Time Indicator Elements */
+        .time-hand {
+            stroke: var(--time-indicator);
+            stroke-width: 2;
+            stroke-dasharray: 4 3;
+            pointer-events: none;
+        }
+    
+        .time-arrow {
+            fill: var(--time-indicator);
+            pointer-events: none;
+            filter: drop-shadow(0 0 3px rgba(255, 85, 85, 0.6));
+        }
+    
+        .time-dot {
+            fill: var(--time-indicator);
+            pointer-events: none;
+        }
+    
+        .hover-indicator {
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+    
+        .hover-arrow {
+            fill: #ffaa00;
+            filter: drop-shadow(0 0 3px rgba(255, 170, 0, 0.6));
+        }
+    
+        .hover-line {
+            stroke: #ffaa00;
+            stroke-width: 1.5;
+            stroke-dasharray: 3 3;
+        }
+    
+        /* Digital Clock Overlay in Dial Center */
+        .digital-clock-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            user-select: none;
+        }
+    
+        .digital-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+    
+        .digital-time .hour {
+            color: var(--digital-hour);
+        }
+    
+        .digital-time .minute {
+            color: var(--digital-minute);
+        }
+    
+        .digital-time .second {
+            color: var(--digital-second);
+            font-size: 1.25rem;
+        }
+    
+        .digital-time .colon {
+            color: #585b70;
+            margin: 0 1px;
+        }
+    
+        .timezone-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #a6adc8;
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+    
+        /* Hover Tooltip Styling */
+        .task-tooltip {
+            position: fixed;
+            display: none;
+            background: #0A0A0A;
+            border: 1px solid var(--accent-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            transition: opacity 0.15s ease;
+        }
+    
+        .task-tooltip .title {
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 2px;
+        }
+    
+        .control-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 0;
+            width: 100%;
+        }
+    
+        h2 {
+            margin: 0 0 10px 0;
+            color: #fff;
+            font-size: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+    
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+    
+        label {
+            font-size: 0.85rem;
+            color: #a6adc8;
+            font-family: 'JetBrains Mono', monospace;
+        }
+    
+        input,
+        select,
+        button {
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: 'JetBrains Mono', monospace;
+            outline: none;
+            box-sizing: border-box;
+            width: 100%;
+        }
+    
+        input:focus,
+        select:focus {
+            border-color: var(--accent-color);
+        }
+    
+        .time-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+    
+        button.add-btn {
+            background: var(--accent-color);
+            color: #11111b;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: opacity 0.2s;
+            margin-top: 5px;
+        }
+    
+        button.add-btn:hover {
+            opacity: 0.9;
+        }
+    
+        .task-list-container {
+            flex: 1;
+            max-height: 200px;
+            overflow-y: auto;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+    
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(10, 10, 10, 0.8);
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border-left: 4px solid var(--accent-color);
+            font-family: 'JetBrains Mono', monospace;
+            gap: 8px;
+        }
+    
+        .task-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+            min-width: 0;
+        }
+    
+        .task-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+            word-break: break-word;
+        }
+    
+        .task-time {
+            font-size: 0.75rem;
+            color: #a6adc8;
+        }
+    
+        .task-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+    
+        .action-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px 6px;
+            font-family: 'JetBrains Mono', monospace;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+    
+        .edit-btn {
+            color: #f9e2af;
+        }
+    
+        .edit-btn:hover {
+            background: rgba(249, 226, 175, 0.15);
+        }
+    
+        .tick-btn {
+            color: #a6e3a1;
+        }
+    
+        .tick-btn:hover {
+            background: rgba(166, 227, 161, 0.15);
+        }
+    
+        .arrow-btn {
+            color: #89b4fa;
+        }
+    
+        .arrow-btn:hover {
+            background: rgba(137, 180, 250, 0.15);
+        }
+    
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: #f38ba8;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 2px 6px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+    
+        .delete-btn:hover {
+            background: rgba(243, 139, 168, 0.1);
+            border-radius: 4px;
+        }
+    
+        .inline-edit-input {
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid var(--accent-color);
+            color: #fff;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+            width: 100%;
+            box-sizing: border-box;
+        }
+    
+        /* ==================== CALENDAR SIDEBAR & NOTCH ==================== */
+        .calendar-notch {
+            position: fixed;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--accent-color);
+            border: 1px solid var(--border-color);
+            padding: 16px 10px;
+            border-radius: 12px 0 0 12px;
+            cursor: pointer;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            box-shadow: -4px 0 16px rgba(0, 0, 0, 0.4);
+            z-index: 130;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+            box-sizing: border-box;
+        }
+    
+        .calendar-notch:hover {
+            background: var(--accent-color);
+            color: #11111b;
+            border-color: var(--accent-color);
+        }
+    
+        .calendar-drawer {
+            position: fixed;
+            top: 12px;
+            bottom: 12px;
+            right: 0;
+            width: 380px;
+            max-width: calc(100vw - 24px);
+            transform: translateX(110%); /* Fixed horizontal stretch bug */
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-right: none;
+            border-radius: 16px 0 0 16px;
+            box-shadow: -8px 0 32px rgba(0, 0, 0, 0.6);
+            z-index: 131;
+            transition: transform 0.3s ease-in-out;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+    
+        .calendar-drawer.open {
+            transform: translateX(0);
+            right: 0;
+        }
+    
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+    
+        .calendar-header h3 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.2rem;
+        }
+    
+        .close-drawer-btn {
+            background: transparent;
+            border: none;
+            color: #a6adc8;
+            font-size: 1.4rem;
+            cursor: pointer;
+            width: auto;
+        }
+    
+        .close-drawer-btn:hover {
+            color: #f38ba8;
+        }
+    
+        .month-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+    
+        .month-nav button {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 4px 10px;
+            cursor: pointer;
+            border-radius: 6px;
+            width: auto;
+        }
+    
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+    
+        .day-name {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #a6adc8;
+            font-weight: bold;
+            padding-bottom: 6px;
+        }
+    
+        .date-cell {
+            width: 100%;
+            height: 44px;
+            box-sizing: border-box;
+            background: rgba(25, 25, 25, 0.8);
+            border: 1px solid transparent;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.15s, background 0.15s;
+        }
+    
+        .date-cell.empty {
+            background: transparent;
+            cursor: default;
+        }
+    
+        .date-cell:not(.empty):hover {
+            border: 2px solid #f9e2af !important;
+            background: rgba(249, 226, 175, 0.1);
+        }
+    
+        .date-cell.today {
+            border: 2px solid #ff5555 !important;
+            font-weight: bold;
+            color: #ff5555;
+        }
+    
+        .task-badge {
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            font-size: 0.6rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            line-height: 1;
+            padding: 1px 3px;
+            border-radius: 3px;
+            background: rgba(186, 150, 64, 0.15);
+        }
+    
+        /* ==================== ANIMATED POPUP MODAL ==================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease-out;
+        }
+    
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    
+        .modal-card {
+            background: #0A0A0A;
+            border: 1px solid var(--accent-color);
+            border-radius: 12px;
+            padding: 20px;
+            width: 320px;
+            max-width: calc(100vw - 32px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transform: scale(0.85);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-sizing: border-box;
+        }
+    
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+    
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    
+        .modal-header h4 {
+            margin: 0;
+            color: var(--accent-color);
+            font-size: 1rem;
+        }
+    
+        .todo-input-row {
+            display: flex;
+            gap: 8px;
+        }
+    
+        .todo-input-row input {
+            flex: 1;
+        }
+    
+        .todo-list {
+            max-height: 200px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+    
+        .todo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(30, 30, 30, 0.8);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            gap: 6px;
+        }
+    
+        .todo-item.done span.todo-text {
+            text-decoration: line-through;
+            color: #6c7086;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- BOTTOM NOTCH & SLIDE PANEL -->
+    <div class="bottom-notch-wrapper">
+        <div class="bottom-notch-panel">
+            <span style="color: #e1819c; font-weight: bold;">Tip:</span> Press <kbd
+                style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);">Ctrl
+                + D</kbd> to bookmark the website or you can pin the tab.
+        </div>
+        <div class="bottom-notch" onclick="window.location.href='https://arnavsite.pages.dev/en/'">
+            <span>Made by</span><span style="color: #e1819c;">Arnav</span>
+        </div>
+    </div>
+
+    <!-- WHOLE WEBSITE FRAME -->
+    <div class="site-frame"></div>
+
+    <!-- TOP NOTCH BAR -->
+    <div class="top-notch" onclick="toggleTopNotch()">
+        <span class="top-notch-date" id="top-notch-date-text">TODAY</span>
+        <span class="top-notch-badge" id="top-notch-count">0 tasks</span>
+    </div>
+
+    <!-- SLIDE DOWN TOP NOTCH PANEL -->
+    <div class="top-notch-panel" id="top-notch-panel">
+        <div class="top-notch-header">
+            <h4 id="top-notch-title">Today's Tasks</h4>
+            <button class="close-drawer-btn" onclick="toggleTopNotch()">&times;</button>
+        </div>
+        <div class="todo-list" id="top-notch-todo-list"></div>
+    </div>
+
+    <div class="container">
+        <div class="visual-panel">
+            <div class="dial-wrapper">
+                <svg viewBox="0 0 400 400" id="clock-svg">
+                    <circle cx="200" cy="200" r="170" class="dial-background" />
+                    <g id="task-slices"></g>
+                    <circle cx="200" cy="200" r="125" fill="#181818" stroke="#45475a" stroke-width="1" />
+                    <g id="dial-markers"></g>
+
+                    <g id="hover-indicator" class="hover-indicator">
+                        <line id="hover-line" class="hover-line" x1="200" y1="200" x2="200" y2="200" />
+                        <polygon id="hover-arrow" class="hover-arrow" points="" />
+                    </g>
+
+                    <g id="current-time-indicator">
+                        <line id="current-time-line" class="time-hand" x1="200" y1="200" x2="200" y2="200" />
+                        <polygon id="current-time-arrow" class="time-arrow" points="" />
+                        <circle id="current-time-dot" class="time-dot" cx="200" cy="200" r="3.5" />
+                    </g>
+                </svg>
+
+                <div class="digital-clock-container">
+                    <div class="digital-time">
+                        <span id="digital-hour" class="hour">00</span>
+                        <span class="colon">:</span>
+                        <span id="digital-minute" class="minute">00</span>
+                        <span class="colon">:</span>
+                        <span id="digital-second" class="second">00</span>
+                    </div>
+                    <div class="timezone-label">LOCAL TIME</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <div>
+                <h2>DMPlanner</h2>
+                <p style="margin: 0; color: #a6adc8; font-size: 0.8rem;">Map & drag your schedule across a 24-hour dial.
+                </p>
+            </div>
+
+            <div class="input-group">
+                <label for="task-title">Task Name</label>
+                <input type="text" id="task-title" placeholder="e.g., Deep Work, Gym">
+            </div>
+
+            <div class="time-inputs">
+                <div class="input-group">
+                    <label for="start-time">Start Time</label>
+                    <input type="time" id="start-time" value="20:00">
+                </div>
+                <div class="input-group">
+                    <label for="task-duration">Duration</label>
+                    <select id="task-duration">
+                        <option value="15">15 min</option>
+                        <option value="30">30 min</option>
+                        <option value="45">45 min</option>
+                        <option value="60">1 hr</option>
+                        <option value="90" selected>1.5 hrs</option>
+                        <option value="120">2 hrs</option>
+                        <option value="150">2.5 hrs</option>
+                        <option value="180">3 hrs</option>
+                        <option value="240">4 hrs</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="end-time">End Time</label>
+                    <input type="time" id="end-time" value="21:30">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="task-color">Color Tag</label>
+                <select id="task-color">
+                    <option value="#89b4fa">Blue (Work)</option>
+                    <option value="#05f140">Green (Health/Rest)</option>
+                    <option value="#d8572a">Orange (Routine)</option>
+                    <option value="#7f2ccb">Purple (Leisure)</option>
+                    <option value="#faf33e">Yellow (Urgent)</option>
+                    <option value="#e71d36">Red (Right Now)</option>
+                </select>
+            </div>
+
+            <button class="add-btn" onclick="addTask()">Add Task to Dial</button>
+
+            <div class="task-list-container">
+                <div id="task-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CALENDAR NOTCH TAB -->
+    <div class="calendar-notch" onclick="toggleCalendar()">CALENDAR</div>
+
+    <!-- CALENDAR DRAWER -->
+    <div class="calendar-drawer" id="calendar-drawer">
+        <div class="calendar-header">
+            <h3>Monthly Planner</h3>
+            <button class="close-drawer-btn" onclick="toggleCalendar()">&times;</button>
+        </div>
+        <div class="month-nav">
+            <button onclick="changeMonth(-1)">&lt;</button>
+            <span id="month-year-label" style="font-weight: bold;"></span>
+            <button onclick="changeMonth(1)">&gt;</button>
+        </div>
+        <div class="calendar-grid" id="calendar-grid"></div>
+    </div>
+
+    <!-- TO-DO POPUP MODAL -->
+    <div class="modal-overlay" id="todo-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h4 id="modal-date-title">Tasks for Date</h4>
+                <button class="close-drawer-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="todo-input-row">
+                <input type="text" id="new-todo-text" placeholder="Add task...">
+                <button class="add-btn" style="margin: 0; padding: 6px 12px;" onclick="addTodoItem()">Add</button>
+            </div>
+            <div class="todo-list" id="modal-todo-list"></div>
+            <button class="add-btn" onclick="saveAndCloseModal()">Save & Close</button>
+        </div>
+    </div>
+
+    <div id="tooltip" class="task-tooltip"></div>
+
+    <script>
+        const SVG_NS = "http://www.w3.org/2000/svg";
+        let tasks = JSON.parse(localStorage.getItem('planner_tasks')) || [];
+
+        let activeTask = null;
+        let dragStartMouseAngle = 0;
+        let taskInitialStartMins = 0;
+        let taskDurationMins = 0;
+
+        function saveTasksToStorage() {
+            localStorage.setItem('planner_tasks', JSON.stringify(tasks));
+        }
+
+        function buildDial() {
+            const markersGroup = document.getElementById('dial-markers');
+            markersGroup.innerHTML = '';
+
+            for (let i = 0; i < 24; i++) {
+                const angle = (i * 360) / 24;
+                const angleRad = (angle * Math.PI) / 180;
+
+                const x1 = 200 + 160 * Math.cos(angleRad);
+                const y1 = 200 + 160 * Math.sin(angleRad);
+                const x2 = 200 + 168 * Math.cos(angleRad);
+                const y2 = 200 + 168 * Math.sin(angleRad);
+
+                const line = document.createElementNS(SVG_NS, "line");
+                line.setAttribute("x1", x1);
+                line.setAttribute("y1", y1);
+                line.setAttribute("x2", x2);
+                line.setAttribute("y2", y2);
+                line.classList.add("hour-marker");
+                markersGroup.appendChild(line);
+
+                if (i % 2 === 0) {
+                    const tx = 200 + 143 * Math.cos(angleRad);
+                    const ty = 200 + 143 * Math.sin(angleRad);
+
+                    const text = document.createElementNS(SVG_NS, "text");
+                    text.setAttribute("x", tx);
+                    text.setAttribute("y", ty);
+                    text.classList.add("hour-text");
+                    text.setAttribute("transform", `rotate(90, ${tx}, ${ty})`);
+                    text.textContent = i.toString().padStart(2, '0');
+                    markersGroup.appendChild(text);
+                }
+            }
+        }
+
+        function timeToMinutes(timeStr) {
+            const [h, m] = timeStr.split(':').map(Number);
+            return h * 60 + m;
+        }
+
+        function minutesToTimeStr(minutes) {
+            let normalized = ((minutes % 1440) + 1440) % 1440;
+            const h = Math.floor(normalized / 60);
+            const m = Math.floor(normalized % 60);
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        }
+
+        function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+            const angleInRadians = (angleInDegrees * Math.PI) / 180.0;
+            return {
+                x: centerX + (radius * Math.cos(angleInRadians)),
+                y: centerY + (radius * Math.sin(angleInRadians))
+            };
+        }
+
+        function describeArc(x, y, radius, startAngle, endAngle) {
+            if (endAngle - startAngle >= 360) {
+                endAngle = startAngle + 359.999;
+            }
+            const start = polarToCartesian(x, y, radius, endAngle);
+            const end = polarToCartesian(x, y, radius, startAngle);
+            const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+            return [
+                "M", start.x, start.y,
+                "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+                "L", x, y,
+                "Z"
+            ].join(" ");
+        }
+
+        function getMouseAngleOnDial(e) {
+            const svg = document.getElementById('clock-svg');
+            const rect = svg.getBoundingClientRect();
+
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const dx = e.clientX - centerX;
+            const dy = e.clientY - centerY;
+
+            let angleRad = Math.atan2(dy, dx);
+            angleRad += Math.PI / 2;
+            let deg = (angleRad * 180) / Math.PI;
+
+            if (deg < 0) deg += 360;
+            return deg;
+        }
+
+        function renderArrowPointer(angleDegrees, innerRadius, outerRadius, lineElem, arrowElem) {
+            const angleRad = (angleDegrees * Math.PI) / 180;
+            const tipX = 200 + outerRadius * Math.cos(angleRad);
+            const tipY = 200 + outerRadius * Math.sin(angleRad);
+            const baseX = 200 + innerRadius * Math.cos(angleRad);
+            const baseY = 200 + innerRadius * Math.sin(angleRad);
+
+            lineElem.setAttribute("x1", baseX);
+            lineElem.setAttribute("y1", baseY);
+            lineElem.setAttribute("x2", tipX);
+            lineElem.setAttribute("y2", tipY);
+
+            const arrowLength = 9;
+            const arrowWidth = 6;
+
+            const normX = Math.cos(angleRad);
+            const normY = Math.sin(angleRad);
+            const perpX = -Math.sin(angleRad);
+            const perpY = Math.cos(angleRad);
+
+            const p1X = tipX - arrowLength * normX + arrowWidth * perpX;
+            const p1Y = tipY - arrowLength * normY + arrowWidth * perpY;
+            const p2X = tipX - arrowLength * normX - arrowWidth * perpX;
+            const p2Y = tipY - arrowLength * normY - arrowWidth * perpY;
+
+            arrowElem.setAttribute("points", `${tipX},${tipY} ${p1X},${p1Y} ${p2X},${p2Y}`);
+        }
+
+        /* ==================== DURATION & TIME SYNC LOGIC ==================== */
+        const startTimeInput = document.getElementById('start-time');
+        const endTimeInput = document.getElementById('end-time');
+        const durationSelect = document.getElementById('task-duration');
+
+        function updateEndTimeFromStart() {
+            const startVal = startTimeInput.value;
+            const duration = parseInt(durationSelect.value, 10);
+            if (!startVal) return;
+            const startMins = timeToMinutes(startVal);
+            const endMins = (startMins + duration) % 1440;
+            endTimeInput.value = minutesToTimeStr(endMins);
+        }
+
+        function updateStartTimeFromEnd() {
+            const endVal = endTimeInput.value;
+            const duration = parseInt(durationSelect.value, 10);
+            if (!endVal) return;
+            const endMins = timeToMinutes(endVal);
+            const startMins = (endMins - duration + 1440) % 1440;
+            startTimeInput.value = minutesToTimeStr(startMins);
+        }
+
+        startTimeInput.addEventListener('input', updateEndTimeFromStart);
+        startTimeInput.addEventListener('change', updateEndTimeFromStart);
+
+        endTimeInput.addEventListener('input', updateStartTimeFromEnd);
+        endTimeInput.addEventListener('change', updateStartTimeFromEnd);
+
+        durationSelect.addEventListener('change', updateEndTimeFromStart);
+
+        function addTask() {
+            const title = document.getElementById('task-title').value.trim() || 'Untitled Task';
+            const start = document.getElementById('start-time').value;
+            const end = document.getElementById('end-time').value;
+            const color = document.getElementById('task-color').value;
+
+            if (!start || !end) {
+                alert("Please select both start and end times.");
+                return;
+            }
+
+            if (timeToMinutes(end) <= timeToMinutes(start)) {
+                alert("End time must be later than the Start time.");
+                return;
+            }
+
+            const task = { id: Date.now(), title, start, end, color };
+            tasks.push(task);
+            saveTasksToStorage();
+            document.getElementById('task-title').value = '';
+            updateUI();
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasksToStorage();
+            updateUI();
+        }
+
+        function toggleEditTask(id, btnElem) {
+            const itemDiv = btnElem.closest('.task-item');
+            const nameSpan = itemDiv.querySelector('.task-name');
+            const isEditing = btnElem.classList.contains('fa-check') || btnElem.innerHTML === '✓';
+
+            if (!isEditing) {
+                // Switch to input mode
+                const currentText = nameSpan.textContent;
+                nameSpan.innerHTML = `<input type="text" class="inline-edit-input" value="${escapeHtml(currentText)}">`;
+                btnElem.innerHTML = '✓';
+                btnElem.classList.remove('edit-btn');
+                btnElem.classList.add('tick-btn');
+                const input = nameSpan.querySelector('input');
+                input.focus();
+                input.setSelectionRange(input.value.length, input.value.length);
+                
+                input.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        saveEditTask(id, input.value, btnElem);
+                    }
+                };
+            } else {
+                // Save mode
+                const input = nameSpan.querySelector('input');
+                saveEditTask(id, input ? input.value : nameSpan.textContent, btnElem);
+            }
+        }
+
+        function saveEditTask(id, newTitle, btnElem) {
+            const cleanedTitle = newTitle.trim() || 'Untitled Task';
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.title = cleanedTitle;
+                saveTasksToStorage();
+            }
+            updateUI();
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function updateUI() {
+            const slicesGroup = document.getElementById('task-slices');
+            const listGroup = document.getElementById('task-list');
+            const tooltip = document.getElementById('tooltip');
+            slicesGroup.innerHTML = '';
+            listGroup.innerHTML = '';
+
+            tasks.forEach(task => {
+                const startMins = timeToMinutes(task.start);
+                const endMins = timeToMinutes(task.end);
+
+                const startAngle = (startMins / 1440) * 360;
+                const endAngle = (endMins / 1440) * 360;
+
+                const pathData = describeArc(200, 200, 168, startAngle, endAngle);
+                const path = document.createElementNS(SVG_NS, "path");
+                path.setAttribute("d", pathData);
+                path.setAttribute("fill", task.color);
+                path.setAttribute("opacity", "0.65");
+                path.classList.add("task-slice");
+
+                path.addEventListener("mousedown", (e) => {
+                    e.stopPropagation();
+                    activeTask = task;
+                    dragStartMouseAngle = getMouseAngleOnDial(e);
+                    taskInitialStartMins = timeToMinutes(task.start);
+                    taskDurationMins = timeToMinutes(task.end) - timeToMinutes(task.start);
+
+                    path.classList.add("dragging");
+                    tooltip.style.display = "none";
+                });
+
+                path.addEventListener("mousemove", (e) => {
+                    if (activeTask) return;
+                    const duration = endMins - startMins;
+                    const hours = Math.floor(duration / 60);
+                    const mins = duration % 60;
+                    const durText = `${hours > 0 ? hours + 'h ' : ''}${mins > 0 ? mins + 'm' : ''}`;
+
+                    tooltip.innerHTML = `
+                    <div class="title" style="color:${task.color}">${task.title}</div>
+                    <div>${task.start} - ${task.end} (${durText})</div>
+                `;
+                    tooltip.style.display = "block";
+                    tooltip.style.left = (e.clientX + 12) + "px";
+                    tooltip.style.top = (e.clientY + 12) + "px";
+                });
+
+                path.addEventListener("mouseleave", () => {
+                    tooltip.style.display = "none";
+                });
+
+                slicesGroup.appendChild(path);
+
+                const item = document.createElement('div');
+                item.classList.add('task-item');
+                item.style.borderLeftColor = task.color;
+                item.innerHTML = `
+                <div class="task-info">
+                    <span class="task-name">${escapeHtml(task.title)}</span>
+                    <span class="task-time">${task.start} - ${task.end}</span>
+                </div>
+                <div class="task-actions">
+                    <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditTask(${task.id}, this)">✎</button>
+                    <button class="delete-btn" title="Delete Task" onclick="deleteTask(${task.id})">&times;</button>
+                </div>
+            `;
+                listGroup.appendChild(item);
+            });
+        }
+
+        const svgElem = document.getElementById('clock-svg');
+        const hoverGroup = document.getElementById('hover-indicator');
+        const hoverLine = document.getElementById('hover-line');
+        const hoverArrow = document.getElementById('hover-arrow');
+        const tooltip = document.getElementById('tooltip');
+
+        svgElem.addEventListener("mousemove", (e) => {
+            const mouseAngle = getMouseAngleOnDial(e);
+            const hoveredMinutes = Math.round((mouseAngle / 360) * 1440);
+            const hoveredTimeStr = minutesToTimeStr(hoveredMinutes);
+
+            renderArrowPointer(mouseAngle, 125, 170, hoverLine, hoverArrow);
+            hoverGroup.style.opacity = "1";
+
+            if (!activeTask && e.target.tagName !== "path") {
+                tooltip.innerHTML = `<div class="title" style="color:#ffaa00;">${hoveredTimeStr}</div>`;
+                tooltip.style.display = "block";
+                tooltip.style.left = (e.clientX + 12) + "px";
+                tooltip.style.top = (e.clientY + 12) + "px";
+            }
+        });
+
+        svgElem.addEventListener("mouseleave", () => {
+            hoverGroup.style.opacity = "0";
+            if (!activeTask) tooltip.style.display = "none";
+        });
+
+        window.addEventListener("mousemove", (e) => {
+            if (!activeTask) return;
+
+            const currentMouseAngle = getMouseAngleOnDial(e);
+            let angleDelta = currentMouseAngle - dragStartMouseAngle;
+
+            if (angleDelta > 180) angleDelta -= 360;
+            if (angleDelta < -180) angleDelta += 360;
+
+            const minuteDelta = (angleDelta / 360) * 1440;
+            let newStartMins = Math.round((taskInitialStartMins + minuteDelta) / 5) * 5;
+
+            if (newStartMins < 0) newStartMins = 0;
+            if (newStartMins + taskDurationMins > 1440) newStartMins = 1440 - taskDurationMins;
+
+            const newEndMins = newStartMins + taskDurationMins;
+
+            activeTask.start = minutesToTimeStr(newStartMins);
+            activeTask.end = minutesToTimeStr(newEndMins);
+
+            updateUI();
+        });
+
+        window.addEventListener("mouseup", () => {
+            if (activeTask) {
+                activeTask = null;
+                saveTasksToStorage();
+                updateUI();
+            }
+        });
+
+        function updateDigitalClock() {
+            const now = new Date();
+
+            const hrs = now.getHours();
+            const mins = now.getMinutes();
+            const secs = now.getSeconds();
+
+            document.getElementById('digital-hour').textContent = String(hrs).padStart(2, '0');
+            document.getElementById('digital-minute').textContent = String(mins).padStart(2, '0');
+            document.getElementById('digital-second').textContent = String(secs).padStart(2, '0');
+
+            const totalMinutes = hrs * 60 + mins + (secs / 60);
+            const currentAngle = (totalMinutes / 1440) * 360;
+
+            const lineElem = document.getElementById('current-time-line');
+            const arrowElem = document.getElementById('current-time-arrow');
+            const dotElem = document.getElementById('current-time-dot');
+
+            renderArrowPointer(currentAngle, 125, 172, lineElem, arrowElem);
+
+            const dotPos = polarToCartesian(200, 200, 125, currentAngle);
+            dotElem.setAttribute("cx", dotPos.x);
+            dotElem.setAttribute("cy", dotPos.y);
+
+            requestAnimationFrame(updateDigitalClock);
+        }
+
+        /* ==================== CALENDAR & TODO LOGIC ==================== */
+        let calendarDate = new Date();
+        let selectedDateKey = '';
+        let dailyTodos = JSON.parse(localStorage.getItem('planner_daily_todos')) || {};
+
+        function getFormattedTodayKey() {
+            const today = new Date();
+            return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        }
+
+        function updateTopNotchBar() {
+            const todayKey = getFormattedTodayKey();
+            const todayList = dailyTodos[todayKey] || [];
+
+            const now = new Date();
+            const options = { month: 'short', day: 'numeric' };
+            document.getElementById('top-notch-date-text').textContent = now.toLocaleDateString('en-US', options).toUpperCase();
+            document.getElementById('top-notch-count').textContent = `${todayList.length} task${todayList.length === 1 ? '' : 's'}`;
+
+            const panelList = document.getElementById('top-notch-todo-list');
+            panelList.innerHTML = '';
+
+            if (todayList.length === 0) {
+                panelList.innerHTML = `<div style="color: #6c7086; font-size: 0.8rem; text-align: center;">No tasks logged for today.</div>`;
+                return;
+            }
+
+            todayList.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = `todo-item ${item.completed ? 'done' : ''}`;
+                div.innerHTML = `
+                    <span class="todo-text" style="flex:1;">${escapeHtml(item.text)}</span>
+                    <div class="task-actions">
+                        <button class="action-btn arrow-btn" title="Add to Dial Task Name" onclick="placeTaskToDial('${escapeHtml(item.text).replace(/'/g, "\\'")}')">⬇</button>
+                        <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditTopNotchTodo(${index}, this)">✎</button>
+                        <button class="delete-btn" title="Delete Task" onclick="deleteTopNotchTodo(${index})">&times;</button>
+                    </div>
+                `;
+                panelList.appendChild(div);
+            });
+        }
+
+        function placeTaskToDial(taskText) {
+            document.getElementById('task-title').value = taskText;
+            document.getElementById('task-title').focus();
+            toggleTopNotch(); // Close notch panel after clicking
+        }
+
+        function toggleEditTopNotchTodo(index, btnElem) {
+            const todayKey = getFormattedTodayKey();
+            if (!dailyTodos[todayKey]) return;
+            const itemDiv = btnElem.closest('.todo-item');
+            const textSpan = itemDiv.querySelector('.todo-text');
+            const isEditing = btnElem.innerHTML === '✓';
+
+            if (!isEditing) {
+                const currentText = dailyTodos[todayKey][index].text;
+                textSpan.innerHTML = `<input type="text" class="inline-edit-input" value="${escapeHtml(currentText)}">`;
+                btnElem.innerHTML = '✓';
+                btnElem.classList.remove('edit-btn');
+                btnElem.classList.add('tick-btn');
+                const input = textSpan.querySelector('input');
+                input.focus();
+                input.setSelectionRange(input.value.length, input.value.length);
+
+                input.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        saveEditTopNotchTodo(todayKey, index, input.value);
+                    }
+                };
+            } else {
+                const input = textSpan.querySelector('input');
+                saveEditTopNotchTodo(todayKey, index, input ? input.value : textSpan.textContent);
+            }
+        }
+
+        function saveEditTopNotchTodo(dateKey, index, newText) {
+            const cleaned = newText.trim();
+            if (cleaned && dailyTodos[dateKey] && dailyTodos[dateKey][index]) {
+                dailyTodos[dateKey][index].text = cleaned;
+                localStorage.setItem('planner_daily_todos', JSON.stringify(dailyTodos));
+            }
+            renderCalendar();
+        }
+
+        function deleteTopNotchTodo(index) {
+            const todayKey = getFormattedTodayKey();
+            if (dailyTodos[todayKey]) {
+                dailyTodos[todayKey].splice(index, 1);
+                if (dailyTodos[todayKey].length === 0) delete dailyTodos[todayKey];
+                localStorage.setItem('planner_daily_todos', JSON.stringify(dailyTodos));
+                renderCalendar();
+            }
+        }
+
+        function toggleTopNotch() {
+            document.getElementById('top-notch-panel').classList.toggle('open');
+        }
+
+        function toggleCalendar() {
+            document.getElementById('calendar-drawer').classList.toggle('open');
+        }
+
+        function changeMonth(delta) {
+            calendarDate.setMonth(calendarDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const label = document.getElementById('month-year-label');
+            grid.innerHTML = '';
+
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"];
+            label.textContent = `${monthNames[month]} ${year}`;
+
+            const dayHeaders = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+            dayHeaders.forEach(d => {
+                const div = document.createElement('div');
+                div.className = 'day-name';
+                div.textContent = d;
+                grid.appendChild(div);
+            });
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'date-cell empty';
+                grid.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = document.createElement('div');
+                cell.className = 'date-cell';
+
+                if (isCurrentMonth && day === today.getDate()) {
+                    cell.classList.add('today');
+                }
+
+                const formattedDateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+                let content = `<span>${day}</span>`;
+                if (dailyTodos[formattedDateKey] && dailyTodos[formattedDateKey].length > 0) {
+                    const count = dailyTodos[formattedDateKey].length;
+                    content += `<span class="task-badge">${count}</span>`;
+                }
+
+                cell.innerHTML = content;
+                cell.onclick = () => openTodoModal(formattedDateKey, day, monthNames[month], year);
+                grid.appendChild(cell);
+            }
+
+            updateTopNotchBar();
+        }
+
+        let activeModalTodos = [];
+
+        function openTodoModal(dateKey, day, monthName, year) {
+            selectedDateKey = dateKey;
+            document.getElementById('modal-date-title').textContent = `${monthName} ${day}, ${year}`;
+            activeModalTodos = dailyTodos[dateKey] ? JSON.parse(JSON.stringify(dailyTodos[dateKey])) : [];
+            renderModalTodoList();
+            document.getElementById('todo-modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('todo-modal').classList.remove('active');
+        }
+
+        function addTodoItem() {
+            const input = document.getElementById('new-todo-text');
+            const val = input.value.trim();
+            if (!val) return;
+            activeModalTodos.push({ text: val, completed: false });
+            input.value = '';
+            renderModalTodoList();
+        }
+
+        function toggleTodoDone(index) {
+            activeModalTodos[index].completed = !activeModalTodos[index].completed;
+            renderModalTodoList();
+        }
+
+        function deleteTodoItem(index) {
+            activeModalTodos.splice(index, 1);
+            renderModalTodoList();
+        }
+
+        function toggleEditModalTodo(index, btnElem) {
+            const itemDiv = btnElem.closest('.todo-item');
+            const textSpan = itemDiv.querySelector('.todo-text');
+            const isEditing = btnElem.innerHTML === '✓';
+
+            if (!isEditing) {
+                const currentText = activeModalTodos[index].text;
+                textSpan.innerHTML = `<input type="text" class="inline-edit-input" value="${escapeHtml(currentText)}">`;
+                btnElem.innerHTML = '✓';
+                btnElem.classList.remove('edit-btn');
+                btnElem.classList.add('tick-btn');
+                const input = textSpan.querySelector('input');
+                input.focus();
+                input.setSelectionRange(input.value.length, input.value.length);
+
+                input.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        saveEditModalTodo(index, input.value);
+                    }
+                };
+            } else {
+                const input = textSpan.querySelector('input');
+                saveEditModalTodo(index, input ? input.value : textSpan.textContent);
+            }
+        }
+
+        function saveEditModalTodo(index, newText) {
+            const cleaned = newText.trim();
+            if (cleaned && activeModalTodos[index]) {
+                activeModalTodos[index].text = cleaned;
+            }
+            renderModalTodoList();
+        }
+
+        function renderModalTodoList() {
+            const listContainer = document.getElementById('modal-todo-list');
+            listContainer.innerHTML = '';
+
+            activeModalTodos.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = `todo-item ${item.completed ? 'done' : ''}`;
+                div.innerHTML = `
+                    <span class="todo-text" onclick="toggleTodoDone(${index})" style="cursor:pointer; flex:1;">${escapeHtml(item.text)}</span>
+                    <div class="task-actions">
+                        <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditModalTodo(${index}, this)">✎</button>
+                        <button class="delete-btn" title="Delete Task" onclick="deleteTodoItem(${index})">&times;</button>
+                    </div>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+
+        function saveAndCloseModal() {
+            if (activeModalTodos.length > 0) {
+                dailyTodos[selectedDateKey] = activeModalTodos;
+            } else {
+                delete dailyTodos[selectedDateKey];
+            }
+            localStorage.setItem('planner_daily_todos', JSON.stringify(dailyTodos));
+            renderCalendar();
+            closeModal();
+        }
+
+        buildDial();
+        updateUI();
+        renderCalendar();
+        updateEndTimeFromStart();
+        requestAnimationFrame(updateDigitalClock);
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">DMPlanner</string>
+    <string name="title_activity_main">DMPlanner</string>
+    <string name="package_name">com.arnav.dmplanner.app</string>
+    <string name="custom_url_scheme">com.arnav.dmplanner.app</string>
+</resources>
