@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>24-Hour Digital Planner</title>
+    <title>DMPlanner</title>
+    <!-- Icon -->
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/arnav4o4/dmplanner/refs/heads/main/favicon.png">
     <!-- Import JetBrains Mono Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -641,7 +643,7 @@
             top: 12px;
             bottom: 12px;
             right: 0;
-            width: 380px;
+            width: 400px;
             max-width: calc(100vw - 24px);
             transform: translateX(110%);
             background: var(--panel-bg);
@@ -657,6 +659,7 @@
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
         }
     
         .calendar-drawer.open {
@@ -668,7 +671,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
     
         .calendar-header h3 {
@@ -698,7 +701,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
     
         .month-nav button {
@@ -709,6 +712,129 @@
             cursor: pointer;
             border-radius: 6px;
             width: auto;
+        }
+
+        .month-year-label {
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--accent-color);
+            background: rgba(10, 10, 10, 0.8);
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .month-year-label:hover {
+            background: rgba(186, 150, 64, 0.15);
+        }
+
+        .month-year-label.current-month {
+            color: #ff5555;
+            border-color: #ff5555;
+        }
+
+        /* ==================== 12-MONTH YEAR GRID VIEW ==================== */
+        .year-grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .month-tile {
+            background: rgba(25, 25, 25, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 6px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            position: relative;
+        }
+
+        .month-tile:hover {
+            border-color: var(--accent-color);
+            background: rgba(186, 150, 64, 0.15);
+            color: #fff;
+        }
+
+        .month-tile.current-real-month {
+            border: 1px solid #ff5555 !important;
+            color: #ff5555;
+            font-weight: bold;
+        }
+
+        .month-tile.selected-month {
+            background: var(--accent-color);
+            color: #111;
+        }
+
+        /* ==================== MONTH TASKS DROPDOWN STYLES ==================== */
+        .month-tasks-section {
+            margin-bottom: 15px;
+        }
+
+        .month-tasks-toggle-btn {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid var(--border-color);
+            color: var(--accent-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .month-tasks-toggle-btn:hover {
+            background: rgba(186, 150, 64, 0.15);
+            border-color: var(--accent-color);
+        }
+
+        .month-tasks-dropdown-content {
+            background: rgba(15, 15, 15, 0.95);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .month-tasks-dropdown-content.open {
+            display: block;
+        }
+
+        .month-task-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 420px) {
+            .month-task-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .month-task-column h5 {
+            margin: 0 0 6px 0;
+            font-size: 0.75rem;
+            color: #a6adc8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 4px;
         }
     
         .calendar-grid {
@@ -844,7 +970,7 @@
         }
     
         .todo-list {
-            max-height: 200px;
+            max-height: 180px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -858,7 +984,7 @@
             background: rgba(30, 30, 30, 0.8);
             padding: 6px 10px;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             gap: 6px;
         }
     
@@ -1040,9 +1166,39 @@
         </div>
         <div class="month-nav">
             <button onclick="changeMonth(-1)">&lt;</button>
-            <span id="month-year-label" style="font-weight: bold;"></span>
+            <span id="month-year-label" class="month-year-label" onclick="toggleYearPickerView()" title="Click to view all 12 months"></span>
             <button onclick="changeMonth(1)">&gt;</button>
         </div>
+
+        <!-- 12-MONTH GRID VIEW CONTAINER -->
+        <div id="year-grid-view" style="display: none;">
+            <div class="year-grid-container" id="year-grid-container"></div>
+        </div>
+
+        <!-- MONTH TASKS DROPDOWN SECTION -->
+        <div class="month-tasks-section" id="month-tasks-section">
+            <button class="month-tasks-toggle-btn" onclick="toggleMonthTaskDropdown()">
+                <span>Total Tasks: <span id="month-total-task-count">0</span></span>
+                <span>▼</span>
+            </button>
+            <div class="month-tasks-dropdown-content" id="month-tasks-dropdown">
+                <div class="todo-input-row">
+                    <input type="text" id="new-month-task-input" placeholder="Add month task...">
+                    <button class="add-btn" style="margin: 0; padding: 6px 12px;" onclick="addMonthTask()">Add</button>
+                </div>
+                <div class="month-task-columns">
+                    <div class="month-task-column">
+                        <h5>Not Assigned</h5>
+                        <div id="month-not-assigned-list" class="todo-list"></div>
+                    </div>
+                    <div class="month-task-column">
+                        <h5>Assigned</h5>
+                        <div id="month-assigned-list" class="todo-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="calendar-grid" id="calendar-grid"></div>
     </div>
 
@@ -1082,7 +1238,7 @@
     <div class="modal-overlay" id="copy-modal">
         <div class="modal-card" style="z-index: 250;">
             <div class="modal-header">
-                <h4>Copy Task to Date</h4>
+                <h4 id="copy-modal-title">Copy Task to Date</h4>
                 <button class="close-drawer-btn" onclick="closeCopyModal()">&times;</button>
             </div>
             <div style="font-size: 0.8rem; color: #a6adc8; word-break: break-word;" id="copy-task-title-preview"></div>
@@ -1090,7 +1246,7 @@
                 <label for="copy-target-date">Target Date</label>
                 <input type="date" id="copy-target-date">
             </div>
-            <button class="add-btn" onclick="confirmCopyTask()">Paste Task to Date</button>
+            <button class="add-btn" id="copy-modal-confirm-btn" onclick="confirmCopyTask()">Paste Task to Date</button>
         </div>
     </div>
 
@@ -1485,8 +1641,12 @@
         let calendarDate = new Date();
         let selectedDateKey = '';
         let dailyTodos = JSON.parse(localStorage.getItem('planner_daily_todos')) || {};
+        let monthTodos = JSON.parse(localStorage.getItem('planner_month_todos')) || {};
+        let isYearPickerOpen = false;
         let openedFromSearch = false;
         let taskToCopyText = "";
+        let taskToAssignId = null;
+        let originalModalTodos = [];
 
         function getFormattedTodayKey() {
             const today = new Date();
@@ -1537,7 +1697,7 @@
             const today = new Date();
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             
-            toggleTopNotch(); // Close top notch panel
+            toggleTopNotch();
             openedFromSearch = false;
             openTodoModal(todayKey, today.getDate(), monthNames[today.getMonth()], today.getFullYear());
         }
@@ -1573,8 +1733,20 @@
         function saveEditTopNotchTodo(dateKey, index, newText) {
             const cleaned = newText.trim();
             if (cleaned && dailyTodos[dateKey] && dailyTodos[dateKey][index]) {
+                const oldText = dailyTodos[dateKey][index].text;
                 dailyTodos[dateKey][index].text = cleaned;
                 localStorage.setItem('planner_daily_todos', JSON.stringify(dailyTodos));
+
+                // Sync with monthTodos
+                const [y, m] = dateKey.split('-');
+                const ymKey = `${y}-${m}`;
+                if (monthTodos[ymKey]) {
+                    const mTask = monthTodos[ymKey].find(mt => mt.text === oldText && mt.assignedDate === dateKey);
+                    if (mTask) {
+                        mTask.text = cleaned;
+                        localStorage.setItem('planner_month_todos', JSON.stringify(monthTodos));
+                    }
+                }
             }
             renderCalendar();
         }
@@ -1582,9 +1754,21 @@
         function deleteTopNotchTodo(index) {
             const todayKey = getFormattedTodayKey();
             if (dailyTodos[todayKey]) {
+                const removedTask = dailyTodos[todayKey][index];
                 dailyTodos[todayKey].splice(index, 1);
                 if (dailyTodos[todayKey].length === 0) delete dailyTodos[todayKey];
                 localStorage.setItem('planner_daily_todos', JSON.stringify(dailyTodos));
+
+                const [y, m] = todayKey.split('-');
+                const ymKey = `${y}-${m}`;
+                if (monthTodos[ymKey]) {
+                    const mTask = monthTodos[ymKey].find(t => t.text === removedTask.text && t.assignedDate === todayKey);
+                    if (mTask) {
+                        mTask.assignedDate = null;
+                        localStorage.setItem('planner_month_todos', JSON.stringify(monthTodos));
+                    }
+                }
+
                 renderCalendar();
             }
         }
@@ -1598,21 +1782,232 @@
         }
 
         function changeMonth(delta) {
-            calendarDate.setMonth(calendarDate.getMonth() + delta);
+            if (isYearPickerOpen) {
+                calendarDate.setFullYear(calendarDate.getFullYear() + delta);
+            } else {
+                calendarDate.setMonth(calendarDate.getMonth() + delta);
+            }
             renderCalendar();
+        }
+
+        function toggleYearPickerView() {
+            isYearPickerOpen = !isYearPickerOpen;
+            renderCalendar();
+        }
+
+        function selectMonthFromYearPicker(monthIndex) {
+            calendarDate.setMonth(monthIndex);
+            isYearPickerOpen = false;
+            renderCalendar();
+        }
+
+        function toggleMonthTaskDropdown() {
+            document.getElementById('month-tasks-dropdown').classList.toggle('open');
+        }
+
+        function getYearMonthKey(year, month) {
+            return `${year}-${String(month + 1).padStart(2, '0')}`;
+        }
+
+        function addMonthTask() {
+            const input = document.getElementById('new-month-task-input');
+            const val = input.value.trim();
+            if (!val) return;
+
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+            const ymKey = getYearMonthKey(year, month);
+
+            if (!monthTodos[ymKey]) {
+                monthTodos[ymKey] = [];
+            }
+
+            monthTodos[ymKey].push({
+                id: Date.now(),
+                text: val,
+                assignedDate: null
+            });
+
+            localStorage.setItem('planner_month_todos', JSON.stringify(monthTodos));
+            input.value = '';
+            renderCalendar();
+        }
+
+        function deleteMonthTask(taskId) {
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+            const ymKey = getYearMonthKey(year, month);
+
+            if (monthTodos[ymKey]) {
+                const taskIdx = monthTodos[ymKey].findIndex(t => t.id === taskId);
+                if (taskIdx !== -1) {
+                    const task = monthTodos[ymKey][taskIdx];
+                    if (task.assignedDate) {
+                        const dateKey = task.assignedDate;
+                        if (dailyTodos[dateKey]) {
+                            dailyTodos[dateKey] = dailyTodos[dateKey].filter(dt => dt.text !== task.text);
+                            if (dailyTodos[dateKey].length === 0) delete dailyTodos[dateKey];
+                            localStorage.setItem('planner_daily_todos', JSON.stringify(dailyTodos));
+                        }
+                        task.assignedDate = null;
+                    } else {
+                        monthTodos[ymKey].splice(taskIdx, 1);
+                        if (monthTodos[ymKey].length === 0) delete monthTodos[ymKey];
+                    }
+                    localStorage.setItem('planner_month_todos', JSON.stringify(monthTodos));
+                    renderCalendar();
+                }
+            }
+        }
+
+        function openAssignDateModal(taskId, taskText) {
+            taskToAssignId = taskId;
+            document.getElementById('copy-modal-title').textContent = "Assign Month Task to Date";
+            document.getElementById('copy-task-title-preview').textContent = `Task: "${taskText}"`;
+            document.getElementById('copy-modal-confirm-btn').setAttribute("onclick", "confirmAssignMonthTask()");
+
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            document.getElementById('copy-target-date').value = todayStr;
+
+            document.getElementById('copy-modal').classList.add('active');
+        }
+
+        function confirmAssignMonthTask() {
+            const targetDateKey = document.getElementById('copy-target-date').value;
+            if (!targetDateKey) {
+                alert("Please select a valid target date.");
+                return;
+            }
+
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+            const ymKey = getYearMonthKey(year, month);
+
+            if (monthTodos[ymKey]) {
+                const task = monthTodos[ymKey].find(t => t.id === taskToAssignId);
+                if (task) {
+                    task.assignedDate = targetDateKey;
+                    localStorage.setItem('planner_month_todos', JSON.stringify(monthTodos));
+
+                    if (!dailyTodos[targetDateKey]) {
+                        dailyTodos[targetDateKey] = [];
+                    }
+                    dailyTodos[targetDateKey].push({ text: task.text, completed: false });
+                    localStorage.setItem('planner_daily_todos', JSON.stringify(dailyTodos));
+                }
+            }
+
+            renderCalendar();
+            closeCopyModal();
         }
 
         function renderCalendar() {
             const grid = document.getElementById('calendar-grid');
             const label = document.getElementById('month-year-label');
+            const yearGridView = document.getElementById('year-grid-view');
+            const yearGridContainer = document.getElementById('year-grid-container');
+            const monthTasksSection = document.getElementById('month-tasks-section');
+            
             grid.innerHTML = '';
+            yearGridContainer.innerHTML = '';
 
             const year = calendarDate.getFullYear();
             const month = calendarDate.getMonth();
 
             const monthNames = ["January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December"];
+            
+            const monthShortNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+            const today = new Date();
+            const isCurrentYear = today.getFullYear() === year;
+
+            if (isYearPickerOpen) {
+                label.textContent = `${year}`;
+                yearGridView.style.display = 'block';
+                monthTasksSection.style.display = 'none';
+                grid.style.display = 'none';
+
+                monthShortNames.forEach((mName, mIdx) => {
+                    const tile = document.createElement('div');
+                    tile.className = 'month-tile';
+
+                    if (isCurrentYear && mIdx === today.getMonth()) {
+                        tile.classList.add('current-real-month');
+                    }
+
+                    if (mIdx === month) {
+                        tile.classList.add('selected-month');
+                    }
+
+                    tile.textContent = mName;
+                    tile.onclick = () => selectMonthFromYearPicker(mIdx);
+                    yearGridContainer.appendChild(tile);
+                });
+                return;
+            }
+
+            yearGridView.style.display = 'none';
+            monthTasksSection.style.display = 'block';
+            grid.style.display = 'grid';
+
             label.textContent = `${monthNames[month]} ${year}`;
+
+            if (today.getFullYear() === year && today.getMonth() === month) {
+                label.classList.add('current-month');
+            } else {
+                label.classList.remove('current-month');
+            }
+
+            // Render Month Tasks
+            const ymKey = getYearMonthKey(year, month);
+            const currentMonthTasks = monthTodos[ymKey] || [];
+            document.getElementById('month-total-task-count').textContent = currentMonthTasks.length;
+
+            const notAssignedList = document.getElementById('month-not-assigned-list');
+            const assignedList = document.getElementById('month-assigned-list');
+            notAssignedList.innerHTML = '';
+            assignedList.innerHTML = '';
+
+            let notAssignedCount = 0;
+            let assignedCount = 0;
+
+            currentMonthTasks.forEach(task => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'todo-item';
+
+                if (!task.assignedDate) {
+                    notAssignedCount++;
+                    itemDiv.innerHTML = `
+                        <span class="todo-text" style="flex:1;">${escapeHtml(task.text)}</span>
+                        <div class="task-actions">
+                            <button class="action-btn arrow-btn" title="Assign to Date" onclick="openAssignDateModal(${task.id}, '${escapeHtml(task.text).replace(/'/g, "\\'")}')">📍</button>
+                            <button class="delete-btn" title="Delete Task" onclick="deleteMonthTask(${task.id})">&times;</button>
+                        </div>
+                    `;
+                    notAssignedList.appendChild(itemDiv);
+                } else {
+                    assignedCount++;
+                    itemDiv.innerHTML = `
+                        <div class="task-info" style="flex:1; min-width:0;">
+                            <span class="todo-text" style="display:block; word-break:break-word;">${escapeHtml(task.text)}</span>
+                            <span class="search-date">${task.assignedDate}</span>
+                        </div>
+                        <div class="task-actions">
+                            <button class="delete-btn" title="Unassign & Remove Task" onclick="deleteMonthTask(${task.id})">&times;</button>
+                        </div>
+                    `;
+                    assignedList.appendChild(itemDiv);
+                }
+            });
+
+            if (notAssignedCount === 0) {
+                notAssignedList.innerHTML = `<div style="color: #6c7086; font-size: 0.75rem; text-align: center; padding: 4px;">None</div>`;
+            }
+            if (assignedCount === 0) {
+                assignedList.innerHTML = `<div style="color: #6c7086; font-size: 0.75rem; text-align: center; padding: 4px;">None</div>`;
+            }
 
             const dayHeaders = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
             dayHeaders.forEach(d => {
@@ -1624,8 +2019,6 @@
 
             const firstDayIndex = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            const today = new Date();
             const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
 
             for (let i = 0; i < firstDayIndex; i++) {
@@ -1667,6 +2060,7 @@
             selectedDateKey = dateKey;
             document.getElementById('modal-date-title').textContent = `${monthName} ${day}, ${year}`;
             activeModalTodos = dailyTodos[dateKey] ? JSON.parse(JSON.stringify(dailyTodos[dateKey])) : [];
+            originalModalTodos = JSON.parse(JSON.stringify(activeModalTodos));
             renderModalTodoList();
             document.getElementById('todo-modal').classList.add('active');
         }
@@ -1762,6 +2156,56 @@
                 delete dailyTodos[selectedDateKey];
             }
             localStorage.setItem('planner_daily_todos', JSON.stringify(dailyTodos));
+
+            // Synchronize edits, additions, and removals with monthTodos
+            const [y, m] = selectedDateKey.split('-');
+            const ymKey = `${y}-${m}`;
+            if (!monthTodos[ymKey]) {
+                monthTodos[ymKey] = [];
+            }
+
+            // 1. Handle edits and removals based on originalModalTodos comparison
+            originalModalTodos.forEach((origT, idx) => {
+                const currentT = activeModalTodos[idx];
+                if (!currentT) {
+                    // Removed
+                    const mTask = monthTodos[ymKey].find(mt => mt.text === origT.text && mt.assignedDate === selectedDateKey);
+                    if (mTask) {
+                        mTask.assignedDate = null;
+                    }
+                } else if (currentT.text !== origT.text) {
+                    // Edited
+                    const mTask = monthTodos[ymKey].find(mt => mt.text === origT.text && mt.assignedDate === selectedDateKey);
+                    if (mTask) {
+                        mTask.text = currentT.text;
+                    } else {
+                        monthTodos[ymKey].push({
+                            id: Date.now() + Math.random(),
+                            text: currentT.text,
+                            assignedDate: selectedDateKey
+                        });
+                    }
+                }
+            });
+
+            // 2. Handle newly added tasks
+            activeModalTodos.forEach((at, idx) => {
+                if (idx >= originalModalTodos.length) {
+                    const unassignedMatch = monthTodos[ymKey].find(mt => mt.text === at.text && !mt.assignedDate);
+                    if (unassignedMatch) {
+                        unassignedMatch.assignedDate = selectedDateKey;
+                    } else {
+                        monthTodos[ymKey].push({
+                            id: Date.now() + Math.random(),
+                            text: at.text,
+                            assignedDate: selectedDateKey
+                        });
+                    }
+                }
+            });
+
+            localStorage.setItem('planner_month_todos', JSON.stringify(monthTodos));
+
             renderCalendar();
             closeModal();
         }
@@ -1839,7 +2283,9 @@
         /* ==================== COPY TASK LOGIC ==================== */
         function openCopyModal(taskText) {
             taskToCopyText = taskText;
+            document.getElementById('copy-modal-title').textContent = "Copy Task to Date";
             document.getElementById('copy-task-title-preview').textContent = `Task: "${taskText}"`;
+            document.getElementById('copy-modal-confirm-btn').setAttribute("onclick", "confirmCopyTask()");
             
             const today = new Date();
             const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -1869,6 +2315,29 @@
             });
 
             localStorage.setItem('planner_daily_todos', JSON.stringify(dailyTodos));
+
+            // Synchronize copied task with monthTodos assigned section
+            const [y, m] = targetDateKey.split('-');
+            const ymKey = `${y}-${m}`;
+            if (!monthTodos[ymKey]) {
+                monthTodos[ymKey] = [];
+            }
+
+            const unassignedMatch = monthTodos[ymKey].find(mt => mt.text === taskToCopyText && !mt.assignedDate);
+            if (unassignedMatch) {
+                unassignedMatch.assignedDate = targetDateKey;
+            } else {
+                const alreadyAssigned = monthTodos[ymKey].find(mt => mt.text === taskToCopyText && mt.assignedDate === targetDateKey);
+                if (!alreadyAssigned) {
+                    monthTodos[ymKey].push({
+                        id: Date.now() + Math.random(),
+                        text: taskToCopyText,
+                        assignedDate: targetDateKey
+                    });
+                }
+            }
+            localStorage.setItem('planner_month_todos', JSON.stringify(monthTodos));
+
             renderCalendar();
             closeCopyModal();
 
