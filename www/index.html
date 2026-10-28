@@ -5,8 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DMPlanner</title>
-    <!-- Icon -->
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/arnav4o4/dmplanner/refs/heads/main/favicon.png">
     <!-- Import JetBrains Mono Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,19 +16,19 @@
             --text-color: #cdd6f4;
             --accent-color: #BA9640;
             --border-color: #0c100f;
-    
+
             --digital-hour: #ffffff;
             --digital-minute: #BA9640;
             --digital-second: #f38ba8;
             --time-indicator: #ff5555;
         }
-    
+
         html, body {
             width: 100%;
             max-width: 100%;
             overflow-x: hidden; /* Fixes WebView canvas stretching */
         }
-    
+
         body {
             font-family: 'JetBrains Mono', monospace, system-ui;
             background-color: var(--bg-color);
@@ -39,7 +37,7 @@
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-    
+
             color: var(--text-color);
             margin: 0;
             padding: 0;
@@ -50,7 +48,7 @@
             box-sizing: border-box;
             position: relative;
         }
-    
+
         /* ==================== WHOLE WEBSITE FRAME ==================== */
         .site-frame {
             position: fixed;
@@ -66,7 +64,7 @@
             box-shadow: 0 0 0 9999px rgba(10, 14, 13, 0.82), inset 0 0 20px rgba(10, 14, 13, 0.82);
             box-sizing: border-box;
         }
-    
+
         /* ==================== TOP NOTCH BAR ==================== */
         .top-notch {
             position: fixed;
@@ -88,18 +86,18 @@
             transition: border-color 0.2s, background 0.2s;
             box-sizing: border-box;
         }
-    
+
         .top-notch:hover {
             border-color: var(--accent-color);
             background: rgba(10, 14, 13, 0.92);
         }
-    
+
         .top-notch-date {
             font-weight: bold;
             color: #fff;
             font-size: 0.85rem;
         }
-    
+
         .top-notch-badge {
             background: var(--accent-color);
             color: #111;
@@ -108,7 +106,7 @@
             padding: 2px 8px;
             border-radius: 12px;
         }
-    
+
         .top-notch-panel {
             position: fixed;
             top: 12px;
@@ -128,25 +126,25 @@
             transition: transform 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
             box-sizing: border-box;
         }
-    
+
         .top-notch-panel.open {
             transform: translate(-50%, 0);
             padding-top: 50px;
         }
-    
+
         .top-notch-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
         }
-    
+
         .top-notch-header h4 {
             margin: 0;
             color: var(--accent-color);
             font-size: 0.95rem;
         }
-    
+
         /* ==================== FIXED BOTTOM NOTCH & PANEL ==================== */
         .bottom-notch-wrapper {
             position: fixed;
@@ -158,7 +156,7 @@
             flex-direction: column;
             align-items: center;
         }
-    
+
         .bottom-notch {
             position: relative;
             background: var(--panel-bg);
@@ -179,12 +177,12 @@
             font-weight: bold;
             color: #fff;
         }
-    
+
         .bottom-notch-wrapper:hover .bottom-notch {
             border-color: #e1819c;
             background: rgba(10, 14, 13, 0.92);
         }
-    
+
         .bottom-notch-panel {
             position: fixed;
             bottom: 0;
@@ -208,11 +206,11 @@
             color: var(--text-color);
             pointer-events: none;
         }
-    
+
         .bottom-notch-wrapper:hover .bottom-notch-panel {
             transform: translate(-50%, 0);
         }
-    
+
         /* ==================== MAIN CONTAINER ==================== */
         .container {
             display: flex;
@@ -230,14 +228,14 @@
             z-index: 10;
             box-sizing: border-box;
         }
-    
+
         @media (max-width: 768px) {
             body {
                 align-items: flex-start;
                 padding: 60px 0;
                 overflow-y: auto;
             }
-    
+
             .container {
                 flex-direction: column;
                 align-items: center;
@@ -245,13 +243,13 @@
                 padding: 16px;
                 gap: 20px;
             }
-    
+
             .dial-wrapper {
                 width: min(300px, 75vw) !important;
                 height: min(300px, 75vw) !important;
             }
         }
-    
+
         .visual-panel {
             display: flex;
             flex-direction: column;
@@ -259,31 +257,31 @@
             justify-content: center;
             position: relative;
         }
-    
+
         .dial-wrapper {
             position: relative;
             width: 340px;
             height: 340px;
         }
-    
+
         svg {
             width: 100%;
             height: 100%;
             transform: rotate(-90deg);
         }
-    
+
         .dial-background {
             fill: #0A0A0A;
             stroke: var(--border-color);
             stroke-width: 2;
         }
-    
+
         .hour-marker {
             stroke: #a6adc8;
             stroke-width: 2;
             stroke-linecap: round;
         }
-    
+
         .hour-text {
             fill: #cdd6f4;
             font-size: 11px;
@@ -292,23 +290,23 @@
             text-anchor: middle;
             dominant-baseline: middle;
         }
-    
+
         .task-slice {
             cursor: grab;
             transition: opacity 0.2s ease, filter 0.2s ease;
         }
-    
+
         .task-slice:hover {
             opacity: 0.95 !important;
             filter: brightness(1.2);
         }
-    
+
         .task-slice.dragging {
             cursor: grabbing !important;
             opacity: 0.9 !important;
             filter: brightness(1.3);
         }
-    
+
         /* Time Indicator Elements */
         .time-hand {
             stroke: var(--time-indicator);
@@ -316,35 +314,35 @@
             stroke-dasharray: 4 3;
             pointer-events: none;
         }
-    
+
         .time-arrow {
             fill: var(--time-indicator);
             pointer-events: none;
             filter: drop-shadow(0 0 3px rgba(255, 85, 85, 0.6));
         }
-    
+
         .time-dot {
             fill: var(--time-indicator);
             pointer-events: none;
         }
-    
+
         .hover-indicator {
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.15s ease;
         }
-    
+
         .hover-arrow {
             fill: #ffaa00;
             filter: drop-shadow(0 0 3px rgba(255, 170, 0, 0.6));
         }
-    
+
         .hover-line {
             stroke: #ffaa00;
             stroke-width: 1.5;
             stroke-dasharray: 3 3;
         }
-    
+
         /* Digital Clock Overlay in Dial Center */
         .digital-clock-container {
             position: absolute;
@@ -358,7 +356,7 @@
             pointer-events: none;
             user-select: none;
         }
-    
+
         .digital-time {
             font-family: 'JetBrains Mono', monospace;
             font-size: 1.75rem;
@@ -368,25 +366,25 @@
             align-items: center;
             gap: 2px;
         }
-    
+
         .digital-time .hour {
             color: var(--digital-hour);
         }
-    
+
         .digital-time .minute {
             color: var(--digital-minute);
         }
-    
+
         .digital-time .second {
             color: var(--digital-second);
             font-size: 1.25rem;
         }
-    
+
         .digital-time .colon {
             color: #585b70;
             margin: 0 1px;
         }
-    
+
         .timezone-label {
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.75rem;
@@ -394,7 +392,7 @@
             margin-top: 4px;
             letter-spacing: 1px;
         }
-    
+
         /* Hover Tooltip Styling */
         .task-tooltip {
             position: fixed;
@@ -411,13 +409,13 @@
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
             transition: opacity 0.15s ease;
         }
-    
+
         .task-tooltip .title {
             font-weight: 600;
             color: var(--accent-color);
             margin-bottom: 2px;
         }
-    
+
         .control-panel {
             flex: 1;
             display: flex;
@@ -426,26 +424,26 @@
             min-width: 0;
             width: 100%;
         }
-    
+
         h2 {
             margin: 0 0 10px 0;
             color: #fff;
             font-size: 1.5rem;
             font-family: 'JetBrains Mono', monospace;
         }
-    
+
         .input-group {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
-    
+
         label {
             font-size: 0.85rem;
             color: #a6adc8;
             font-family: 'JetBrains Mono', monospace;
         }
-    
+
         input,
         select,
         button {
@@ -460,7 +458,7 @@
             box-sizing: border-box;
             width: 100%;
         }
-    
+
         input:focus,
         select:focus {
             border-color: var(--accent-color);
@@ -469,13 +467,13 @@
         input[type="date"] {
             color-scheme: dark;
         }
-    
+
         .time-inputs {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 8px;
         }
-    
+
         button.add-btn {
             background: var(--accent-color);
             color: #11111b;
@@ -485,11 +483,11 @@
             transition: opacity 0.2s;
             margin-top: 5px;
         }
-    
+
         button.add-btn:hover {
             opacity: 0.9;
         }
-    
+
         .task-list-container {
             flex: 1;
             max-height: 200px;
@@ -497,7 +495,7 @@
             border-top: 1px solid var(--border-color);
             padding-top: 15px;
         }
-    
+
         .task-item {
             display: flex;
             align-items: center;
@@ -510,7 +508,7 @@
             font-family: 'JetBrains Mono', monospace;
             gap: 8px;
         }
-    
+
         .task-info {
             display: flex;
             flex-direction: column;
@@ -518,24 +516,24 @@
             flex: 1;
             min-width: 0;
         }
-    
+
         .task-name {
             font-weight: 500;
             font-size: 0.9rem;
             word-break: break-word;
         }
-    
+
         .task-time {
             font-size: 0.75rem;
             color: #a6adc8;
         }
-    
+
         .task-actions {
             display: flex;
             align-items: center;
             gap: 4px;
         }
-    
+
         .action-btn {
             background: transparent;
             border: none;
@@ -546,11 +544,11 @@
             border-radius: 4px;
             transition: background 0.15s;
         }
-    
+
         .edit-btn {
             color: #f9e2af;
         }
-    
+
         .edit-btn:hover {
             background: rgba(249, 226, 175, 0.15);
         }
@@ -562,23 +560,23 @@
         .copy-btn:hover {
             background: rgba(137, 180, 250, 0.15);
         }
-    
+
         .tick-btn {
             color: #a6e3a1;
         }
-    
+
         .tick-btn:hover {
             background: rgba(166, 227, 161, 0.15);
         }
-    
+
         .arrow-btn {
             color: #89b4fa;
         }
-    
+
         .arrow-btn:hover {
             background: rgba(137, 180, 250, 0.15);
         }
-    
+
         .delete-btn {
             background: transparent;
             border: none;
@@ -588,12 +586,12 @@
             padding: 2px 6px;
             font-family: 'JetBrains Mono', monospace;
         }
-    
+
         .delete-btn:hover {
             background: rgba(243, 139, 168, 0.1);
             border-radius: 4px;
         }
-    
+
         .inline-edit-input {
             background: rgba(20, 20, 20, 0.9);
             border: 1px solid var(--accent-color);
@@ -605,7 +603,7 @@
             width: 100%;
             box-sizing: border-box;
         }
-    
+
         /* ==================== CALENDAR SIDEBAR & NOTCH ==================== */
         .calendar-notch {
             position: fixed;
@@ -631,13 +629,13 @@
             transition: background 0.2s, color 0.2s, border-color 0.2s;
             box-sizing: border-box;
         }
-    
+
         .calendar-notch:hover {
             background: var(--accent-color);
             color: #11111b;
             border-color: var(--accent-color);
         }
-    
+
         .calendar-drawer {
             position: fixed;
             top: 12px;
@@ -661,25 +659,25 @@
             flex-direction: column;
             overflow-y: auto;
         }
-    
+
         .calendar-drawer.open {
             transform: translateX(0);
             right: 0;
         }
-    
+
         .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
         }
-    
+
         .calendar-header h3 {
             margin: 0;
             color: #fff;
             font-size: 1.2rem;
         }
-    
+
         .close-drawer-btn {
             background: transparent;
             border: none;
@@ -692,18 +690,18 @@
             justify-content: center;
             padding: 4px;
         }
-    
+
         .close-drawer-btn:hover {
             color: #f38ba8;
         }
-    
+
         .month-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
         }
-    
+
         .month-nav button {
             background: rgba(30, 30, 30, 0.8);
             border: 1px solid var(--border-color);
@@ -836,13 +834,13 @@
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 4px;
         }
-    
+
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 6px;
         }
-    
+
         .day-name {
             text-align: center;
             font-size: 0.75rem;
@@ -850,7 +848,7 @@
             font-weight: bold;
             padding-bottom: 6px;
         }
-    
+
         .date-cell {
             width: 100%;
             height: 44px;
@@ -867,23 +865,23 @@
             overflow: hidden;
             transition: border-color 0.15s, background 0.15s;
         }
-    
+
         .date-cell.empty {
             background: transparent;
             cursor: default;
         }
-    
+
         .date-cell:not(.empty):hover {
             border: 2px solid #f9e2af !important;
             background: rgba(249, 226, 175, 0.1);
         }
-    
+
         .date-cell.today {
             border: 2px solid #ff5555 !important;
             font-weight: bold;
             color: #ff5555;
         }
-    
+
         .task-badge {
             position: absolute;
             top: 2px;
@@ -896,7 +894,7 @@
             border-radius: 3px;
             background: rgba(186, 150, 64, 0.15);
         }
-    
+
         /* ==================== ANIMATED POPUP MODAL ==================== */
         .modal-overlay {
             position: fixed;
@@ -915,12 +913,12 @@
             pointer-events: none;
             transition: opacity 0.25s ease-out;
         }
-    
+
         .modal-overlay.active {
             opacity: 1;
             pointer-events: auto;
         }
-    
+
         .modal-card {
             background: #0A0A0A;
             border: 1px solid var(--accent-color);
@@ -936,29 +934,29 @@
             transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-sizing: border-box;
         }
-    
+
         .modal-overlay.active .modal-card {
             transform: scale(1);
         }
-    
+
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-    
+
         .modal-header h4 {
             margin: 0;
             color: var(--accent-color);
             font-size: 1rem;
         }
-    
+
         .todo-input-row {
             display: flex;
             gap: 8px;
             align-items: center;
         }
-    
+
         .todo-input-row input {
             flex: 1;
             width: auto;
@@ -968,7 +966,7 @@
             width: auto;
             flex-shrink: 0;
         }
-    
+
         .todo-list {
             max-height: 180px;
             overflow-y: auto;
@@ -976,7 +974,7 @@
             flex-direction: column;
             gap: 6px;
         }
-    
+
         .todo-item {
             display: flex;
             align-items: center;
@@ -987,7 +985,7 @@
             font-size: 0.8rem;
             gap: 6px;
         }
-    
+
         .todo-item.done span.todo-text {
             text-decoration: line-through;
             color: #6c7086;
@@ -1018,6 +1016,130 @@
             color: var(--accent-color);
             font-weight: bold;
         }
+
+        /* ==================== SYNC / DATA CORNER MOLE BUTTON & PANEL ==================== */
+        .sync-corner-btn {
+            position: fixed;
+            bottom: 12px;
+            right: 12px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--accent-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px 0 0 0;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 130;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            transition: background 0.2s, color 0.2s, transform 0.2s, border-color 0.2s;
+            box-sizing: border-box;
+        }
+        .sync-corner-btn svg {
+            width: 18px !important;  /* Locks width to a crisp, small scale */
+            height: 18px !important; /* Locks height to a crisp, small scale */
+            display: block;          /* Prevents any baseline alignment spacing issues */
+        }
+
+        
+        .sync-corner-btn:hover {
+            background: var(--accent-color);
+            color: #11111b;
+            /*transform: scale(1);*/
+            border-color: var(--accent-color);
+        }
+
+        .sync-drawer {
+            position: fixed;
+            top: 12px;
+            bottom: 12px;
+            right: 0;
+            width: 420px;
+            max-width: calc(100vw - 24px);
+            transform: translateX(110%);
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-right: none;
+            border-radius: 16px 0 0 16px;
+            box-shadow: -8px 0 32px rgba(0, 0, 0, 0.6);
+            z-index: 141;
+            transition: transform 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sync-drawer.open {
+            transform: translateX(0);
+        }
+
+        .sync-section {
+            background: rgba(20, 20, 20, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .sync-section h4 {
+            margin: 0 0 8px 0;
+            color: var(--accent-color);
+            font-size: 0.95rem;
+        }
+
+        .sync-drawer textarea {
+            width: 100%;
+            height: 110px;
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            resize: vertical;
+            outline: none;
+            box-sizing: border-box;
+            margin-top: 6px;
+            margin-bottom: 8px;
+        }
+
+        .sync-drawer textarea:focus {
+            border-color: var(--accent-color);
+        }
+
+        /* ==================== IN-APP TOAST NOTIFICATION ==================== */
+        .app-toast {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background:#ff5555; /* Accent color background */
+            color: #11111b;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            opacity: 0;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .app-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -1032,6 +1154,54 @@
         </div>
         <div class="bottom-notch" onclick="window.location.href='https://arnavsite.pages.dev/en/'">
             <span>Made by</span><span style="color: #e1819c;">Arnav</span>
+        </div>
+    </div>
+
+    <!-- CORNER "MOLE" BUTTON FOR CROSS-PLATFORM SYNC -->
+    <div class="sync-corner-btn" onclick="toggleSyncDrawer()" title="Cross-Platform Sync & Backup">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+    </div>
+
+    <!-- SYNC FLYOUT PANEL (RIGHT-SIDE SLIDE-OVER) -->
+    <div class="sync-drawer" id="sync-drawer">
+        <div class="calendar-header">
+            <h3>Cross-Platform Sync</h3>
+            <button class="close-drawer-btn" onclick="toggleSyncDrawer()">&times;</button>
+        </div>
+        <p style="font-size: 0.8rem; color: #a6adc8; margin-top: 0; margin-bottom: 20px;">
+            Export your tasks and calendar data to sync across devices, or safely import/merge backups without losing existing local data.
+        </p>
+
+        <!-- EXPORT SECTION -->
+        <div class="sync-section">
+            <h4>Export Data</h4>
+            <p style="font-size: 0.75rem; color: #a6adc8; margin: 0 0 12px 0;">Download all your dial schedules, daily to-dos, and month tasks as a JSON file or copy them.</p>
+            <div style="display: flex; gap: 8px;">
+                <button class="add-btn" style="margin: 0;" onclick="exportDataFile()">Download .json</button>
+                <button class="add-btn" style="margin: 0; background: #89b4fa; color: #111;" onclick="copyExportJson()">Copy JSON</button>
+            </div>
+        </div>
+
+        <!-- IMPORT & MERGE SECTION -->
+        <div class="sync-section">
+            <h4>Import & Merge Data</h4>
+            <p style="font-size: 0.75rem; color: #a6adc8; margin: 0 0 8px 0;">Upload a backup file or paste JSON code below. Data will be merged safely.</p>
+
+            <div class="input-group" style="margin-bottom: 10px;">
+                <label for="import-file-picker">Upload JSON Backup File</label>
+                <input type="file" id="import-file-picker" accept=".json" onchange="handleFileImport(event)">
+            </div>
+
+            <div class="input-group">
+                <label for="import-json-input">Or Paste JSON Data</label>
+                <textarea id="import-json-input" placeholder="Paste export JSON here..."></textarea>
+            </div>
+
+            <button class="add-btn" onclick="importFromTextarea()">Merge & Import Data</button>
         </div>
     </div>
 
@@ -1455,7 +1625,7 @@
                 const input = nameSpan.querySelector('input');
                 input.focus();
                 input.setSelectionRange(input.value.length, input.value.length);
-                
+
                 input.onkeydown = (e) => {
                     if (e.key === 'Enter') {
                         saveEditTask(id, input.value, btnElem);
@@ -1696,7 +1866,7 @@
             const todayKey = getFormattedTodayKey();
             const today = new Date();
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            
+
             toggleTopNotch();
             openedFromSearch = false;
             openTodoModal(todayKey, today.getDate(), monthNames[today.getMonth()], today.getFullYear());
@@ -1737,7 +1907,6 @@
                 dailyTodos[dateKey][index].text = cleaned;
                 localStorage.setItem('planner_daily_todos', JSON.stringify(dailyTodos));
 
-                // Sync with monthTodos
                 const [y, m] = dateKey.split('-');
                 const ymKey = `${y}-${m}`;
                 if (monthTodos[ymKey]) {
@@ -1779,6 +1948,10 @@
 
         function toggleCalendar() {
             document.getElementById('calendar-drawer').classList.toggle('open');
+        }
+
+        function toggleSyncDrawer() {
+            document.getElementById('sync-drawer').classList.toggle('open');
         }
 
         function changeMonth(delta) {
@@ -1908,7 +2081,7 @@
             const yearGridView = document.getElementById('year-grid-view');
             const yearGridContainer = document.getElementById('year-grid-container');
             const monthTasksSection = document.getElementById('month-tasks-section');
-            
+
             grid.innerHTML = '';
             yearGridContainer.innerHTML = '';
 
@@ -1917,7 +2090,7 @@
 
             const monthNames = ["January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December"];
-            
+
             const monthShortNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
             const today = new Date();
@@ -2157,24 +2330,20 @@
             }
             localStorage.setItem('planner_daily_todos', JSON.stringify(dailyTodos));
 
-            // Synchronize edits, additions, and removals with monthTodos
             const [y, m] = selectedDateKey.split('-');
             const ymKey = `${y}-${m}`;
             if (!monthTodos[ymKey]) {
                 monthTodos[ymKey] = [];
             }
 
-            // 1. Handle edits and removals based on originalModalTodos comparison
             originalModalTodos.forEach((origT, idx) => {
                 const currentT = activeModalTodos[idx];
                 if (!currentT) {
-                    // Removed
                     const mTask = monthTodos[ymKey].find(mt => mt.text === origT.text && mt.assignedDate === selectedDateKey);
                     if (mTask) {
                         mTask.assignedDate = null;
                     }
                 } else if (currentT.text !== origT.text) {
-                    // Edited
                     const mTask = monthTodos[ymKey].find(mt => mt.text === origT.text && mt.assignedDate === selectedDateKey);
                     if (mTask) {
                         mTask.text = currentT.text;
@@ -2188,7 +2357,6 @@
                 }
             });
 
-            // 2. Handle newly added tasks
             activeModalTodos.forEach((at, idx) => {
                 if (idx >= originalModalTodos.length) {
                     const unassignedMatch = monthTodos[ymKey].find(mt => mt.text === at.text && !mt.assignedDate);
@@ -2215,7 +2383,7 @@
             document.getElementById('search-task-input').value = '';
             document.getElementById('search-results-list').innerHTML = '<div style="color: #6c7086; font-size: 0.8rem; text-align: center; margin-top: 10px;">Start typing to search...</div>';
             document.getElementById('search-modal').classList.add('active');
-            
+
             setTimeout(() => {
                 document.getElementById('search-task-input').focus();
             }, 100);
@@ -2228,7 +2396,7 @@
         function performSearch() {
             const query = document.getElementById('search-task-input').value.trim().toLowerCase();
             const resultsList = document.getElementById('search-results-list');
-            
+
             if (!query) {
                 resultsList.innerHTML = '<div style="color: #6c7086; font-size: 0.8rem; text-align: center; margin-top: 10px;">Start typing to search...</div>';
                 return;
@@ -2242,7 +2410,7 @@
                 tasksArray.forEach(task => {
                     if (task.text.toLowerCase().includes(query)) {
                         foundCount++;
-                        
+
                         const [y, m, d] = dateKey.split('-');
                         const dateObj = new Date(parseInt(y, 10), parseInt(m, 10) - 1, parseInt(d, 10));
                         const displayDate = `${monthNames[dateObj.getMonth()]} ${parseInt(d, 10)}, ${y}`;
@@ -2267,17 +2435,17 @@
         function jumpToTaskDate(dateKey) {
             openedFromSearch = true;
             closeSearchModal();
-            
+
             setTimeout(() => {
                 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
                 const [y, m, d] = dateKey.split('-');
-                
+
                 const monthName = monthNames[parseInt(m, 10) - 1];
                 const day = parseInt(d, 10);
                 const year = parseInt(y, 10);
-                
+
                 openTodoModal(dateKey, day, monthName, year);
-            }, 250); 
+            }, 250);
         }
 
         /* ==================== COPY TASK LOGIC ==================== */
@@ -2286,11 +2454,11 @@
             document.getElementById('copy-modal-title').textContent = "Copy Task to Date";
             document.getElementById('copy-task-title-preview').textContent = `Task: "${taskText}"`;
             document.getElementById('copy-modal-confirm-btn').setAttribute("onclick", "confirmCopyTask()");
-            
+
             const today = new Date();
             const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
             document.getElementById('copy-target-date').value = todayStr;
-            
+
             document.getElementById('copy-modal').classList.add('active');
         }
 
@@ -2315,35 +2483,173 @@
             });
 
             localStorage.setItem('planner_daily_todos', JSON.stringify(dailyTodos));
-
-            // Synchronize copied task with monthTodos assigned section
-            const [y, m] = targetDateKey.split('-');
-            const ymKey = `${y}-${m}`;
-            if (!monthTodos[ymKey]) {
-                monthTodos[ymKey] = [];
-            }
-
-            const unassignedMatch = monthTodos[ymKey].find(mt => mt.text === taskToCopyText && !mt.assignedDate);
-            if (unassignedMatch) {
-                unassignedMatch.assignedDate = targetDateKey;
-            } else {
-                const alreadyAssigned = monthTodos[ymKey].find(mt => mt.text === taskToCopyText && mt.assignedDate === targetDateKey);
-                if (!alreadyAssigned) {
-                    monthTodos[ymKey].push({
-                        id: Date.now() + Math.random(),
-                        text: taskToCopyText,
-                        assignedDate: targetDateKey
-                    });
-                }
-            }
-            localStorage.setItem('planner_month_todos', JSON.stringify(monthTodos));
-
             renderCalendar();
             closeCopyModal();
 
             if (selectedDateKey === targetDateKey && document.getElementById('todo-modal').classList.contains('active')) {
                 activeModalTodos.push({ text: taskToCopyText, completed: false });
                 renderModalTodoList();
+            }
+        }
+
+        /* ==================== EXPORT & SMART MERGE IMPORT LOGIC ==================== */
+        function getPayloadData() {
+            return {
+                version: 1,
+                exportedAt: new Date().toISOString(),
+                tasks: JSON.parse(localStorage.getItem('planner_tasks') || '[]'),
+                daily_todos: JSON.parse(localStorage.getItem('planner_daily_todos') || '{}'),
+                month_todos: JSON.parse(localStorage.getItem('planner_month_todos') || '{}')
+            };
+        }
+
+        async function exportDataFile() {
+            const data = getPayloadData();
+            const jsonString = JSON.stringify(data, null, 2);
+            const filename = `dmplanner_backup_${new Date().toISOString().slice(0, 10)}.json`;
+        
+            // Check if running inside the Capacitor Android App
+            const isCapacitor = window.Capacitor && window.Capacitor.isNativePlatform();
+        
+            if (isCapacitor) {
+                try {
+                    const { FileSharer } = window.Capacitor.Plugins;
+                    const base64Data = btoa(unescape(encodeURIComponent(jsonString)));
+        
+                    await FileSharer.save({
+                        filename: filename,
+                        contentType: 'application/json',
+                        base64Data: base64Data,
+                    });
+                    
+                    // Show in-app toast for mobile app download success
+                    showInAppToast('Successfully saved to Downloads!');
+                } catch (error) {
+                    console.error('Capacitor export failed:', error);
+                    showInAppToast('Export failed: ' + error);
+                }
+            } else {
+                // Regular web browser flow
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", url);
+                downloadAnchor.setAttribute("download", filename);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+                URL.revokeObjectURL(url);
+        
+                // Show in-app toast for browser download success
+                showInAppToast('JSON file downloaded successfully!');
+            }
+        }
+        
+        function copyExportJson() {
+            const data = getPayloadData();
+            navigator.clipboard.writeText(JSON.stringify(data, null, 2)).then(() => {
+                alert("Backup JSON successfully copied to clipboard!");
+            }).catch(err => {
+                alert("Failed to copy JSON: " + err);
+            });
+        }
+
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('import-json-input').value = e.target.result;
+            };
+            reader.readAsText(file);
+        }
+
+        function importFromTextarea() {
+            const raw = document.getElementById('import-json-input').value.trim();
+            if (!raw) {
+                alert("Please upload a file or paste JSON data first.");
+                return;
+            }
+            processAndMergeData(raw);
+        }
+
+        function processAndMergeData(jsonString) {
+            try {
+                const imported = JSON.parse(jsonString);
+                if (!imported || typeof imported !== 'object') {
+                    throw new Error("Invalid JSON structure.");
+                }
+
+                // 1. Merge Dial Tasks (planner_tasks)
+                let currentTasks = JSON.parse(localStorage.getItem('planner_tasks') || '[]');
+                if (Array.isArray(imported.tasks)) {
+                    imported.tasks.forEach(impTask => {
+                        const exists = currentTasks.some(t => t.title === impTask.title && t.start === impTask.start && t.end === impTask.end);
+                        if (!exists) {
+                            currentTasks.push({
+                                ...impTask,
+                                id: Date.now() + Math.random() // Unique ID to prevent collision
+                            });
+                        }
+                    });
+                    localStorage.setItem('planner_tasks', JSON.stringify(currentTasks));
+                }
+
+                // 2. Merge Daily Todos (planner_daily_todos)
+                let currentDaily = JSON.parse(localStorage.getItem('planner_daily_todos') || '{}');
+                if (imported.daily_todos && typeof imported.daily_todos === 'object') {
+                    for (const [dateKey, todos] of Object.entries(imported.daily_todos)) {
+                        if (!currentDaily[dateKey]) {
+                            currentDaily[dateKey] = todos;
+                        } else {
+                            todos.forEach(impTodo => {
+                                const hasTodo = currentDaily[dateKey].some(t => t.text === impTodo.text);
+                                if (!hasTodo) {
+                                    currentDaily[dateKey].push(impTodo);
+                                }
+                            });
+                        }
+                    }
+                    localStorage.setItem('planner_daily_todos', JSON.stringify(currentDaily));
+                }
+
+                // 3. Merge Month Todos (planner_month_todos)
+                let currentMonth = JSON.parse(localStorage.getItem('planner_month_todos') || '{}');
+                if (imported.month_todos && typeof imported.month_todos === 'object') {
+                    for (const [ymKey, mTasks] of Object.entries(imported.month_todos)) {
+                        if (!currentMonth[ymKey]) {
+                            currentMonth[ymKey] = mTasks;
+                        } else {
+                            mTasks.forEach(impMTask => {
+                                const hasMTask = currentMonth[ymKey].some(mt => mt.text === impMTask.text && mt.assignedDate === impMTask.assignedDate);
+                                if (!hasMTask) {
+                                    currentMonth[ymKey].push({
+                                        ...impMTask,
+                                        id: Date.now() + Math.random()
+                                    });
+                                }
+                            });
+                        }
+                    }
+                    localStorage.setItem('planner_month_todos', JSON.stringify(currentMonth));
+                }
+
+                // Refresh app state in memory & UI
+                tasks = JSON.parse(localStorage.getItem('planner_tasks')) || [];
+                dailyTodos = JSON.parse(localStorage.getItem('planner_daily_todos')) || {};
+                monthTodos = JSON.parse(localStorage.getItem('planner_month_todos')) || {};
+
+                updateUI();
+                renderCalendar();
+                updateTopNotchBar();
+
+                document.getElementById('import-json-input').value = '';
+                document.getElementById('import-file-picker').value = '';
+                toggleSyncDrawer();
+
+                alert("Data successfully merged and imported! No recipient data was lost.");
+            } catch (err) {
+                alert("Import failed: Please check your JSON format. " + err.message);
             }
         }
 
@@ -2356,6 +2662,8 @@
                     closeModal();
                 } else if (document.getElementById('search-modal').classList.contains('active')) {
                     closeSearchModal();
+                } else if (document.getElementById('sync-drawer').classList.contains('open')) {
+                    toggleSyncDrawer();
                 } else if (document.getElementById('top-notch-panel').classList.contains('open')) {
                     document.getElementById('top-notch-panel').classList.remove('open');
                 } else if (document.getElementById('calendar-drawer').classList.contains('open')) {
@@ -2369,6 +2677,30 @@
         renderCalendar();
         updateEndTimeFromStart();
         requestAnimationFrame(updateDigitalClock);
+
+
+
+        function showInAppToast(message) {
+            // Remove any existing toast if present
+            let existingToast = document.getElementById('app-toast-box');
+            if (existingToast) existingToast.remove();
+        
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.id = 'app-toast-box';
+            toast.className = 'app-toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+        
+            // Trigger smooth slide-in animation
+            setTimeout(() => toast.classList.add('show'), 10);
+        
+            // Slide out and remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
     </script>
 
 </body>
