@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DMPlanner</title>
+    <!-- Website icon -->
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/arnav4o4/dmplanner/refs/heads/main/favicon.png">
     <!-- Import JetBrains Mono Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,7 +34,7 @@
         body {
             font-family: 'JetBrains Mono', monospace, system-ui;
             background-color: var(--bg-color);
-            background-image: url('https://i.ibb.co/XxsW1wbq/bg.jpg');
+            background-image: url('https://raw.githubusercontent.com/arnav4o4/dmplanner/refs/heads/main/bg.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -1587,17 +1589,20 @@
             const start = document.getElementById('start-time').value;
             const end = document.getElementById('end-time').value;
             const color = document.getElementById('task-color').value;
-
+        
             if (!start || !end) {
                 alert("Please select both start and end times.");
                 return;
             }
-
-            if (timeToMinutes(end) <= timeToMinutes(start)) {
-                alert("End time must be later than the Start time.");
-                return;
+        
+            let startMins = timeToMinutes(start);
+            let endMins = timeToMinutes(end);
+        
+            // If end time is earlier or equal to start time, it wraps into the next day
+            if (endMins <= startMins) {
+                endMins += 1440; // Add 24 hours worth of minutes
             }
-
+        
             const task = { id: Date.now(), title, start, end, color };
             tasks.push(task);
             saveTasksToStorage();
@@ -1659,67 +1664,79 @@
             listGroup.innerHTML = '';
 
             tasks.forEach(task => {
-                const startMins = timeToMinutes(task.start);
-                const endMins = timeToMinutes(task.end);
-
-                const startAngle = (startMins / 1440) * 360;
-                const endAngle = (endMins / 1440) * 360;
-
-                const pathData = describeArc(200, 200, 168, startAngle, endAngle);
-                const path = document.createElementNS(SVG_NS, "path");
-                path.setAttribute("d", pathData);
-                path.setAttribute("fill", task.color);
-                path.setAttribute("opacity", "0.65");
-                path.classList.add("task-slice");
-
-                path.addEventListener("mousedown", (e) => {
-                    e.stopPropagation();
-                    activeTask = task;
-                    dragStartMouseAngle = getMouseAngleOnDial(e);
-                    taskInitialStartMins = timeToMinutes(task.start);
-                    taskDurationMins = timeToMinutes(task.end) - timeToMinutes(task.start);
-
-                    path.classList.add("dragging");
-                    tooltip.style.display = "none";
-                });
-
-                path.addEventListener("mousemove", (e) => {
-                    if (activeTask) return;
-                    const duration = endMins - startMins;
-                    const hours = Math.floor(duration / 60);
-                    const mins = duration % 60;
-                    const durText = `${hours > 0 ? hours + 'h ' : ''}${mins > 0 ? mins + 'm' : ''}`;
-
-                    tooltip.innerHTML = `
-                    <div class="title" style="color:${task.color}">${task.title}</div>
-                    <div>${task.start} - ${task.end} (${durText})</div>
-                `;
-                    tooltip.style.display = "block";
-                    tooltip.style.left = (e.clientX + 12) + "px";
-                    tooltip.style.top = (e.clientY + 12) + "px";
-                });
-
-                path.addEventListener("mouseleave", () => {
-                    tooltip.style.display = "none";
-                });
-
-                slicesGroup.appendChild(path);
-
-                const item = document.createElement('div');
-                item.classList.add('task-item');
-                item.style.borderLeftColor = task.color;
-                item.innerHTML = `
-                <div class="task-info">
-                    <span class="task-name">${escapeHtml(task.title)}</span>
-                    <span class="task-time">${task.start} - ${task.end}</span>
-                </div>
-                <div class="task-actions">
-                    <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditTask(${task.id}, this)">🖍</button>
-                    <button class="delete-btn" title="Delete Task" onclick="deleteTask(${task.id})">&times;</button>
-                </div>
-            `;
-                listGroup.appendChild(item);
-            });
+                            let startMins = timeToMinutes(task.start);
+                            let endMins = timeToMinutes(task.end);
+            
+                            // Handle cross-midnight wrapping for dial rendering
+                            if (endMins <= startMins) {
+                                endMins += 1440;
+                            }
+            
+                            const startAngle = (startMins / 1440) * 360;
+                            const endAngle = (endMins / 1440) * 360;
+            
+                            const pathData = describeArc(200, 200, 168, startAngle, endAngle);
+                            const path = document.createElementNS(SVG_NS, "path");
+                            path.setAttribute("d", pathData);
+                            path.setAttribute("fill", task.color);
+                            path.setAttribute("opacity", "0.65");
+                            path.classList.add("task-slice");
+            
+                            path.addEventListener("mousedown", (e) => {
+                                e.stopPropagation();
+                                activeTask = task;
+                                dragStartMouseAngle = getMouseAngleOnDial(e);
+                                taskInitialStartMins = timeToMinutes(task.start);
+                                
+                                let eMins = timeToMinutes(task.end);
+                                if (eMins <= taskInitialStartMins) eMins += 1440;
+                                taskDurationMins = eMins - taskInitialStartMins;
+            
+                                path.classList.add("dragging");
+                                tooltip.style.display = "none";
+                            });
+            
+                            path.addEventListener("mousemove", (e) => {
+                                if (activeTask) return;
+                                let realEndMins = timeToMinutes(task.end);
+                                if (realEndMins <= startMins) realEndMins += 1440;
+                                const duration = realEndMins - startMins;
+                                
+                                const hours = Math.floor(duration / 60);
+                                const mins = duration % 60;
+                                const durText = `${hours > 0 ? hours + 'h ' : ''}${mins > 0 ? mins + 'm' : ''}`;
+            
+                                tooltip.innerHTML = `
+                                <div class="title" style="color:${task.color}">${task.title}</div>
+                                <div>${task.start} - ${task.end} (${durText})</div>
+                            `;
+                                tooltip.style.display = "block";
+                                tooltip.style.left = (e.clientX + 12) + "px";
+                                tooltip.style.top = (e.clientY + 12) + "px";
+                            });
+            
+                            path.addEventListener("mouseleave", () => {
+                                tooltip.style.display = "none";
+                            });
+            
+                            slicesGroup.appendChild(path);
+            
+                            const item = document.createElement('div');
+                            item.classList.add('task-item');
+                            item.style.borderLeftColor = task.color;
+                            item.innerHTML = `
+                            <div class="task-info">
+                                <span class="task-name">${escapeHtml(task.title)}</span>
+                                <span class="task-time">${task.start} - ${task.end}</span>
+                            </div>
+                            <div class="task-actions">
+                                <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditTask(${task.id}, this)">🖍</button>
+                                <button class="delete-btn" title="Delete Task" onclick="deleteTask(${task.id})">&times;</button>
+                            </div>
+                        `;
+                            listGroup.appendChild(item);
+                        });
+            
         }
 
         const svgElem = document.getElementById('clock-svg');
@@ -2675,6 +2692,7 @@
         buildDial();
         updateUI();
         renderCalendar();
+        startTimeInput.value = getCurrentTimeString();
         updateEndTimeFromStart();
         requestAnimationFrame(updateDigitalClock);
 
@@ -2701,6 +2719,22 @@
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
+
+        function getCurrentTimeString() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            
+            // Round to nearest 5 minutes for clean scheduling
+            minutes = Math.round(minutes / 5) * 5;
+            if (minutes === 60) {
+                minutes = 0;
+                hours = (hours + 1) % 24;
+            }
+            
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+        }
+        
     </script>
 
 </body>
