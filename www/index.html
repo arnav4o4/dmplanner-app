@@ -5,12 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DMPlanner</title>
+    <!-- Preload background image instantly to prevent opening lag -->
+    <link rel="preload" href="https://raw.githubusercontent.com/arnav4o4/dmplanner/refs/heads/main/bg.jpg" as="image">
     <!-- Website icon -->
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/arnav4o4/dmplanner/refs/heads/main/favicon.png">
     <!-- Import JetBrains Mono Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Import Redaction 35 Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Redaction+35&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #0A0A0A;
@@ -32,24 +36,35 @@
         }
 
         body {
-            font-family: 'JetBrains Mono', monospace, system-ui;
-            background-color: var(--bg-color);
-            background-image: url('https://raw.githubusercontent.com/arnav4o4/dmplanner/refs/heads/main/bg.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
-            position: relative;
-        }
+                    font-family: 'JetBrains Mono', monospace, system-ui;
+                    background-color: var(--bg-color);
+                    background-image: url('https://raw.githubusercontent.com/arnav4o4/dmplanner/refs/heads/main/bg.jpg');
+                    background-size: cover;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-attachment: fixed;
+                    color: var(--text-color);
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                    box-sizing: border-box;
+                    position: relative;
+                    animation: bgZoomIn 1.5s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+                }
+        
+                @keyframes bgZoomIn {
+                    0% {
+                        filter: brightness(0.4) blur(10px);
+                        transform: scale(1.03);
+                    }
+                    100% {
+                        filter: brightness(1) blur(0px);
+                        transform: scale(1);
+                    }
+                }
 
         /* ==================== WHOLE WEBSITE FRAME ==================== */
         .site-frame {
@@ -148,70 +163,74 @@
         }
 
         /* ==================== FIXED BOTTOM NOTCH & PANEL ==================== */
-        .bottom-notch-wrapper {
-            position: fixed;
-            bottom: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 150;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .bottom-notch {
-            position: relative;
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px 12px 0 0;
-            padding: 8px 24px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            z-index: 151;
-            box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            transition: border-color 0.2s, background 0.2s;
-            box-sizing: border-box;
-            font-size: 0.85rem;
-            font-weight: bold;
-            color: #fff;
-        }
-
-        .bottom-notch-wrapper:hover .bottom-notch {
-            border-color: #e1819c;
-            background: rgba(10, 14, 13, 0.92);
-        }
-
-        .bottom-notch-panel {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translate(-50%, 120%);
-            width: 380px;
-            max-width: calc(100vw - 32px);
-            background: var(--panel-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border-color);
-            border-bottom: none;
-            border-radius: 16px 16px 0 0;
-            padding: 20px 20px 52px 20px;
-            box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.7);
-            z-index: 149;
-            transition: transform 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
-            box-sizing: border-box;
-            text-align: center;
-            font-size: 0.85rem;
-            color: var(--text-color);
-            pointer-events: none;
-        }
-
-        .bottom-notch-wrapper:hover .bottom-notch-panel {
-            transform: translate(-50%, 0);
-        }
+                .bottom-notch-wrapper {
+                    position: fixed;
+                    bottom: 12px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    z-index: 150;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+        
+                .bottom-notch {
+                    position: relative;
+                    background: var(--panel-bg);
+                    border: 1px solid var(--border-color);
+                    border-radius: 12px 12px 0 0;
+                    padding: 8px 24px;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    cursor: pointer;
+                    z-index: 151;
+                    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6);
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
+                    transition: border-color 0.2s, background 0.2s;
+                    box-sizing: border-box;
+                    font-size: 0.85rem;
+                    font-weight: bold;
+                    color: #fff;
+                }
+        
+                .bottom-notch-wrapper:hover .bottom-notch {
+                    border-color: #e1819c;
+                    background: rgba(10, 14, 13, 0.92);
+                }
+        
+                .bottom-notch-panel {
+                    position: absolute;
+                    bottom: 100%;
+                    left: 50%;
+                    transform: translateX(-50%) translateY(10px);
+                    width: 380px;
+                    max-width: calc(100vw - 32px);
+                    background: var(--panel-bg);
+                    backdrop-filter: blur(16px);
+                    -webkit-backdrop-filter: blur(16px);
+                    border: 1px solid var(--border-color);
+                    border-radius: 16px;
+                    padding: 16px 20px;
+                    margin-bottom: 8px;
+                    box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.7);
+                    z-index: 149;
+                    opacity: 0;
+                    visibility: hidden;
+                    transition: all 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
+                    box-sizing: border-box;
+                    text-align: center;
+                    font-size: 0.85rem;
+                    color: var(--text-color);
+                    pointer-events: none;
+                }
+        
+                .bottom-notch-wrapper:hover .bottom-notch-panel {
+                    opacity: 1;
+                    visibility: visible;
+                    transform: translateX(-50%) translateY(0);
+                }
 
         /* ==================== MAIN CONTAINER ==================== */
         .container {
@@ -429,9 +448,9 @@
 
         h2 {
             margin: 0 0 10px 0;
-            color: #fff;
-            font-size: 1.5rem;
-            font-family: 'JetBrains Mono', monospace;
+                        color: #fff;
+                        font-size: 2.5rem; /* Slightly increased size works well with Redaction's unique proportions */
+                        font-family: 'Redaction 35', 'JetBrains Mono', monospace;
         }
 
         .input-group {
@@ -491,12 +510,14 @@
         }
 
         .task-list-container {
-            flex: 1;
-            max-height: 200px;
-            overflow-y: auto;
-            border-top: 1px solid var(--border-color);
-            padding-top: 15px;
-        }
+                    flex: 1;
+                    height: 160px; /* Gives a reliable fixed tracking height */
+                    max-height: 160px;
+                    overflow-y: auto;
+                    border-top: 1px solid var(--border-color);
+                    padding-top: 15px;
+                    box-sizing: border-box;
+                }
 
         .task-item {
             display: flex;
@@ -1047,7 +1068,7 @@
             display: block;          /* Prevents any baseline alignment spacing issues */
         }
 
-        
+
         .sync-corner-btn:hover {
             background: var(--accent-color);
             color: #11111b;
@@ -1137,11 +1158,111 @@
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
             pointer-events: none;
         }
-        
+
         .app-toast.show {
             transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
+
+        /* ==================== SPLASH SCREEN ==================== */
+                .splash-screen {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    background: rgba(10, 14, 13, 0.85);
+                    backdrop-filter: blur(20px);
+                    -webkit-backdrop-filter: blur(20px);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 9999;
+                    animation: splashFadeOut 0.8s ease 1.5s forwards;
+                    pointer-events: none;
+                }
+        
+                .splash-content {
+                    text-align: center;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                    padding: 0 20px;
+                    animation: splashContentZoom 0.8s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+                }
+        
+                .splash-title {
+                    margin: 0;
+                    font-family: 'Redaction 35', 'JetBrains Mono', monospace;
+                    font-size: 3rem;
+                    color: #fff;
+                    letter-spacing: 2px;
+                }
+        
+                .splash-quote {
+                    margin: 0;
+                    font-family: 'JetBrains Mono', monospace;
+                    font-size: 0.9rem;
+                    color: var(--accent-color);
+                }
+        
+                @keyframes splashFadeOut {
+                    0% {
+                        opacity: 1;
+                        visibility: visible;
+                    }
+                    100% {
+                        opacity: 0;
+                        visibility: hidden;
+                    }
+                }
+        
+                @keyframes splashContentZoom {
+                    0% {
+                        transform: scale(0.9);
+                        opacity: 0;
+                    }
+                    100% {
+                        transform: scale(1);
+                        opacity: 1;
+                    }
+                }
+                /* ==================== HIDE SCROLLBAR ==================== */
+                        /* For Chrome, Safari, and Opera */
+                        ::-webkit-scrollbar {
+                            display: none;
+                            width: 0px;
+                            background: transparent;
+                        }
+                
+                        /* For IE, Edge, and Firefox */
+                        html {
+                            -ms-overflow-style: none;  /* IE and Edge */
+                            scrollbar-width: none;  /* Firefox */
+                        }
+                /* ================= edit task option ================*/
+                        .edit-button-group {
+                                    display: grid;
+                                    grid-template-columns: 1fr 1fr;
+                                    gap: 8px;
+                                    margin-top: 5px;
+                                }
+                        
+                                button.cancel-btn {
+                                    background: rgba(243, 139, 168, 0.15);
+                                    border: 1px solid #f38ba8;
+                                    color: #f38ba8;
+                                    font-weight: bold;
+                                    cursor: pointer;
+                                    border-radius: 8px;
+                                    padding: 10px;
+                                    font-family: 'JetBrains Mono', monospace;
+                                    transition: background 0.2s;
+                                }
+                        
+                                button.cancel-btn:hover {
+                                    background: rgba(243, 139, 168, 0.25);
+                                }
     </style>
 </head>
 
@@ -1265,8 +1386,6 @@
         <div class="control-panel">
             <div>
                 <h2>DMPlanner</h2>
-                <p style="margin: 0; color: #a6adc8; font-size: 0.8rem;">Map & drag your schedule across a 24-hour dial.
-                </p>
             </div>
 
             <div class="input-group">
@@ -1311,7 +1430,10 @@
                 </select>
             </div>
 
-            <button class="add-btn" onclick="addTask()">Add Task to Dial</button>
+            <!-- Action Buttons Container -->
+            <div id="form-action-buttons">
+                <button class="add-btn" id="main-action-btn" onclick="addTask()">Add Task to Dial</button>
+            </div>
 
             <div class="task-list-container">
                 <div id="task-list"></div>
@@ -1423,6 +1545,14 @@
     </div>
 
     <div id="tooltip" class="task-tooltip"></div>
+
+    <!-- SPLASH SCREEN OVERLAY -->
+        <div class="splash-screen" id="splash-screen">
+            <div class="splash-content">
+                <h1 class="splash-title">DMPlanner</h1>
+                <p class="splash-quote">Map & drag your schedule across a 24-hour dial.</p>
+            </div>
+        </div>
 
     <script>
         const SVG_NS = "http://www.w3.org/2000/svg";
@@ -1584,73 +1714,91 @@
 
         durationSelect.addEventListener('change', updateEndTimeFromStart);
 
-        function addTask() {
-            const title = document.getElementById('task-title').value.trim() || 'Untitled Task';
-            const start = document.getElementById('start-time').value;
-            const end = document.getElementById('end-time').value;
-            const color = document.getElementById('task-color').value;
-        
-            if (!start || !end) {
-                alert("Please select both start and end times.");
-                return;
-            }
-        
-            let startMins = timeToMinutes(start);
-            let endMins = timeToMinutes(end);
-        
-            // If end time is earlier or equal to start time, it wraps into the next day
-            if (endMins <= startMins) {
-                endMins += 1440; // Add 24 hours worth of minutes
-            }
-        
-            const task = { id: Date.now(), title, start, end, color };
-            tasks.push(task);
-            saveTasksToStorage();
-            document.getElementById('task-title').value = '';
-            updateUI();
-        }
-
         function deleteTask(id) {
             tasks = tasks.filter(t => t.id !== id);
             saveTasksToStorage();
             updateUI();
         }
 
-        function toggleEditTask(id, btnElem) {
-            const itemDiv = btnElem.closest('.task-item');
-            const nameSpan = itemDiv.querySelector('.task-name');
-            const isEditing = btnElem.classList.contains('fa-check') || btnElem.innerHTML === '✓';
-
-            if (!isEditing) {
-                const currentText = nameSpan.textContent;
-                nameSpan.innerHTML = `<input type="text" class="inline-edit-input" value="${escapeHtml(currentText)}">`;
-                btnElem.innerHTML = '✓';
-                btnElem.classList.remove('edit-btn');
-                btnElem.classList.add('tick-btn');
-                const input = nameSpan.querySelector('input');
-                input.focus();
-                input.setSelectionRange(input.value.length, input.value.length);
-
-                input.onkeydown = (e) => {
-                    if (e.key === 'Enter') {
-                        saveEditTask(id, input.value, btnElem);
+        let editingTaskId = null; // Tracks if we are currently editing a task
+        
+                function addTask() {
+                    const title = document.getElementById('task-title').value.trim() || 'Untitled Task';
+                    const start = document.getElementById('start-time').value;
+                    const end = document.getElementById('end-time').value;
+                    const color = document.getElementById('task-color').value;
+        
+                    if (!start || !end) {
+                        alert("Please select both start and end times.");
+                        return;
                     }
-                };
-            } else {
-                const input = nameSpan.querySelector('input');
-                saveEditTask(id, input ? input.value : nameSpan.textContent, btnElem);
-            }
-        }
-
-        function saveEditTask(id, newTitle, btnElem) {
-            const cleanedTitle = newTitle.trim() || 'Untitled Task';
-            const task = tasks.find(t => t.id === id);
-            if (task) {
-                task.title = cleanedTitle;
-                saveTasksToStorage();
-            }
-            updateUI();
-        }
+        
+                    let startMins = timeToMinutes(start);
+                    let endMins = timeToMinutes(end);
+        
+                    if (endMins <= startMins) {
+                        endMins += 1440;
+                    }
+        
+                    if (editingTaskId !== null) {
+                        // Update existing task
+                        const task = tasks.find(t => t.id === editingTaskId);
+                        if (task) {
+                            task.title = title;
+                            task.start = start;
+                            task.end = end;
+                            task.color = color;
+                        }
+                        cancelEditMode();
+                    } else {
+                        // Add new task
+                        const task = { id: Date.now(), title, start, end, color };
+                        tasks.push(task);
+                        document.getElementById('task-title').value = '';
+                    }
+        
+                    saveTasksToStorage();
+                    updateUI();
+                }
+        
+                function toggleEditTask(id, btnElem) {
+                    const task = tasks.find(t => t.id === id);
+                    if (!task) return;
+        
+                    editingTaskId = id;
+        
+                    // Populate form fields with task data
+                    document.getElementById('task-title').value = task.title;
+                    document.getElementById('start-time').value = task.start;
+                    document.getElementById('end-time').value = task.end;
+                    document.getElementById('task-color').value = task.color;
+        
+                    // Scroll up smoothly to the control panel form
+                    document.getElementById('task-title').focus();
+                    document.getElementById('task-title').scrollIntoView({ behavior: 'smooth' });
+        
+                    // Swap button to Confirm / Cancel mode
+                    const buttonContainer = document.getElementById('form-action-buttons');
+                    buttonContainer.innerHTML = `
+                        <div class="edit-button-group">
+                            <button class="add-btn" style="margin-top:0;" onclick="addTask()">Confirm</button>
+                            <button class="cancel-btn" onclick="cancelEditMode()">Cancel</button>
+                        </div>
+                    `;
+                }
+        
+                function cancelEditMode() {
+                    editingTaskId = null;
+                    document.getElementById('task-title').value = '';
+                    document.getElementById('start-time').value = getCurrentTimeString();
+                    updateEndTimeFromStart();
+        
+                    // Revert button back to default "Add Task to Dial"
+                    const buttonContainer = document.getElementById('form-action-buttons');
+                    buttonContainer.innerHTML = `
+                        <button class="add-btn" id="main-action-btn" onclick="addTask()">Add Task to Dial</button>
+                    `;
+                }
 
         function escapeHtml(str) {
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -1666,46 +1814,46 @@
             tasks.forEach(task => {
                             let startMins = timeToMinutes(task.start);
                             let endMins = timeToMinutes(task.end);
-            
+
                             // Handle cross-midnight wrapping for dial rendering
                             if (endMins <= startMins) {
                                 endMins += 1440;
                             }
-            
+
                             const startAngle = (startMins / 1440) * 360;
                             const endAngle = (endMins / 1440) * 360;
-            
+
                             const pathData = describeArc(200, 200, 168, startAngle, endAngle);
                             const path = document.createElementNS(SVG_NS, "path");
                             path.setAttribute("d", pathData);
                             path.setAttribute("fill", task.color);
                             path.setAttribute("opacity", "0.65");
                             path.classList.add("task-slice");
-            
+
                             path.addEventListener("mousedown", (e) => {
                                 e.stopPropagation();
                                 activeTask = task;
                                 dragStartMouseAngle = getMouseAngleOnDial(e);
                                 taskInitialStartMins = timeToMinutes(task.start);
-                                
+
                                 let eMins = timeToMinutes(task.end);
                                 if (eMins <= taskInitialStartMins) eMins += 1440;
                                 taskDurationMins = eMins - taskInitialStartMins;
-            
+
                                 path.classList.add("dragging");
                                 tooltip.style.display = "none";
                             });
-            
+
                             path.addEventListener("mousemove", (e) => {
                                 if (activeTask) return;
                                 let realEndMins = timeToMinutes(task.end);
                                 if (realEndMins <= startMins) realEndMins += 1440;
                                 const duration = realEndMins - startMins;
-                                
+
                                 const hours = Math.floor(duration / 60);
                                 const mins = duration % 60;
                                 const durText = `${hours > 0 ? hours + 'h ' : ''}${mins > 0 ? mins + 'm' : ''}`;
-            
+
                                 tooltip.innerHTML = `
                                 <div class="title" style="color:${task.color}">${task.title}</div>
                                 <div>${task.start} - ${task.end} (${durText})</div>
@@ -1714,13 +1862,13 @@
                                 tooltip.style.left = (e.clientX + 12) + "px";
                                 tooltip.style.top = (e.clientY + 12) + "px";
                             });
-            
+
                             path.addEventListener("mouseleave", () => {
                                 tooltip.style.display = "none";
                             });
-            
+
                             slicesGroup.appendChild(path);
-            
+
                             const item = document.createElement('div');
                             item.classList.add('task-item');
                             item.style.borderLeftColor = task.color;
@@ -1730,13 +1878,13 @@
                                 <span class="task-time">${task.start} - ${task.end}</span>
                             </div>
                             <div class="task-actions">
-                                <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditTask(${task.id}, this)">🖍</button>
+                                <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditTask(${task.id}, this)">✒️</button>
                                 <button class="delete-btn" title="Delete Task" onclick="deleteTask(${task.id})">&times;</button>
                             </div>
                         `;
                             listGroup.appendChild(item);
                         });
-            
+
         }
 
         const svgElem = document.getElementById('clock-svg');
@@ -1865,7 +2013,7 @@
                     <div class="task-actions">
                         <button class="action-btn arrow-btn" title="Add to Dial Task Name" onclick="placeTaskToDial('${escapeHtml(item.text).replace(/'/g, "\\'")}')">⬇</button>
                         <button class="action-btn copy-btn" title="Copy to Date" onclick="openCopyModal('${escapeHtml(item.text).replace(/'/g, "\\'")}')">⎙</button>
-                        <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditTopNotchTodo(${index}, this)">🖍</button>
+                        <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditTopNotchTodo(${index}, this)">✒️</button>
                         <button class="delete-btn" title="Delete Task" onclick="deleteTopNotchTodo(${index})">&times;</button>
                     </div>
                 `;
@@ -2331,7 +2479,7 @@
                     <span class="todo-text" onclick="toggleTodoDone(${index})" style="cursor:pointer; flex:1;">${escapeHtml(item.text)}</span>
                     <div class="task-actions">
                         <button class="action-btn copy-btn" title="Copy to Date" onclick="openCopyModal('${escapeHtml(item.text).replace(/'/g, "\\'")}')">⎙</button>
-                        <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditModalTodo(${index}, this)">🖍</button>
+                        <button class="action-btn edit-btn" title="Edit Task" onclick="toggleEditModalTodo(${index}, this)">✒️</button>
                         <button class="delete-btn" title="Delete Task" onclick="deleteTodoItem(${index})">&times;</button>
                     </div>
                 `;
@@ -2524,21 +2672,21 @@
             const data = getPayloadData();
             const jsonString = JSON.stringify(data, null, 2);
             const filename = `dmplanner_backup_${new Date().toISOString().slice(0, 10)}.json`;
-        
+
             // Check if running inside the Capacitor Android App
             const isCapacitor = window.Capacitor && window.Capacitor.isNativePlatform();
-        
+
             if (isCapacitor) {
                 try {
                     const { FileSharer } = window.Capacitor.Plugins;
                     const base64Data = btoa(unescape(encodeURIComponent(jsonString)));
-        
+
                     await FileSharer.save({
                         filename: filename,
                         contentType: 'application/json',
                         base64Data: base64Data,
                     });
-                    
+
                     // Show in-app toast for mobile app download success
                     showInAppToast('Successfully saved to Downloads!');
                 } catch (error) {
@@ -2556,12 +2704,12 @@
                 downloadAnchor.click();
                 downloadAnchor.remove();
                 URL.revokeObjectURL(url);
-        
+
                 // Show in-app toast for browser download success
                 showInAppToast('JSON file downloaded successfully!');
             }
         }
-        
+
         function copyExportJson() {
             const data = getPayloadData();
             navigator.clipboard.writeText(JSON.stringify(data, null, 2)).then(() => {
@@ -2702,17 +2850,17 @@
             // Remove any existing toast if present
             let existingToast = document.getElementById('app-toast-box');
             if (existingToast) existingToast.remove();
-        
+
             // Create toast element
             const toast = document.createElement('div');
             toast.id = 'app-toast-box';
             toast.className = 'app-toast';
             toast.textContent = message;
             document.body.appendChild(toast);
-        
+
             // Trigger smooth slide-in animation
             setTimeout(() => toast.classList.add('show'), 10);
-        
+
             // Slide out and remove after 3 seconds
             setTimeout(() => {
                 toast.classList.remove('show');
@@ -2724,17 +2872,23 @@
             const now = new Date();
             let hours = now.getHours();
             let minutes = now.getMinutes();
-            
+
             // Round to nearest 5 minutes for clean scheduling
             minutes = Math.round(minutes / 5) * 5;
             if (minutes === 60) {
                 minutes = 0;
                 hours = (hours + 1) % 24;
             }
-            
+
             return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
         }
-        
+        // Smooth Background Image Preloader & Animator
+                const bgImageUrl = 'https://raw.githubusercontent.com/arnav4o4/dmplanner/refs/heads/main/bg.jpg';
+                const imgPreloader = new Image();
+                imgPreloader.src = bgImageUrl;
+                imgPreloader.onload = function() {
+                    document.body.classList.add('bg-loaded');
+                };
     </script>
 
 </body>

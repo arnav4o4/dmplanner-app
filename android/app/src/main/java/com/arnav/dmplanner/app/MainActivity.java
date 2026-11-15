@@ -9,6 +9,7 @@ import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import com.getcapacitor.BridgeActivity;
+import android.webkit.WebView;
 
 public class MainActivity extends BridgeActivity {
     @Override
@@ -21,6 +22,12 @@ public class MainActivity extends BridgeActivity {
         window.setNavigationBarColor(Color.TRANSPARENT);
 
         window.getDecorView().post(() -> hideSystemUI());
+        // Hide scrollbars for the Capacitor WebView
+                if (this.bridge != null && this.bridge.getWebView() != null) {
+                    WebView webView = this.bridge.getWebView();
+                    webView.setVerticalScrollBarEnabled(false);
+                    webView.setHorizontalScrollBarEnabled(false);
+                }
     }
 
     @Override
